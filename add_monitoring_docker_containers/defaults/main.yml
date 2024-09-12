@@ -1,0 +1,5 @@
+---
+image_names_path: ../files/image_names.py
+dest: /etc/zabbix/scripts
+is_docker_container_available_path: ../files/is_docker_container_available.py
+zabbix_agent2_conf: /etc/zabbix/zabbix_agent2.conf

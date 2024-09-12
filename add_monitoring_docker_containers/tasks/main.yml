@@ -1,0 +1,59 @@
+---
+- name: Check if UserParameter for image_names is already added
+  shell: "cat {{ zabbix_agent2_conf }} | grep '^UserParameter=docker.image_names.*'"
+  register: result_image_names
+  ignore_errors: yes
+
+- name: Debug the UserParameter for image_names status
+  debug:
+    msg: "UserParameter for image_names is already added"
+  when: result_image_names != 0
+
+- name: Check if UserParameter for is_docker_container_available is already added
+  shell: "cat {{ zabbix_agent2_conf }} | grep '^UserParameter=docker.container.image_name.*'"
+  register: result_is_docker_container_available
+  ignore_errors: yes
+
+- name: Debug the UserParameter for is_docker_container_available status
+  debug:
+    msg: "UserParameter for is_docker_container_available is already added"
+  when: result_is_docker_container_available != 0
+
+- name: Create directory for scripts
+  file:
+    path: "{{ dest }}"
+    state: directory
+    mode: '0755'
+  when: result_image_names.rc != 0 or result_is_docker_container_available.rc != 0
+
+- name: Move image_names.py to server
+  copy: src={{ image_names_path }} dest={{ dest }}
+  when: result_image_names.rc != 0
+
+- name: Move is_docker_container_available.py to server
+  copy: src={{ is_docker_container_available_path }} dest={{ dest }}
+  when: result_is_docker_container_available.rc != 0
+
+- name: Add permissions for image_names.py
+  shell: sudo chmod o+x "{{ dest }}"/image_names.py
+  when: result_image_names.rc != 0
+
+- name: Add permissions for is_docker_container_available.py
+  shell: sudo chmod o+x "{{ dest }}"/is_docker_container_available.py
+  when: result_is_docker_container_available.rc != 0
+
+- name: Add user parameter docker.image_names in zabbix_agent
+  shell: echo 'UserParameter=docker.image_names,{{ dest }}/image_names.py' >> /etc/zabbix/zabbix_agent2.conf
+  when: result_image_names.rc != 0
+
+- name: Add user parameter docker.container.image_name in zabbix_agent
+  shell: echo 'UserParameter=docker.container.image_name[*],{{ dest }}/is_docker_container_available.py $1' >> /etc/zabbix/zabbix_agent2.conf
+  when: result_is_docker_container_available.rc != 0
+
+- name: Add zabbix user to docker group
+  shell: "usermod -aG docker zabbix"
+  when: result_image_names.rc != 0 or result_is_docker_container_available.rc != 0
+
+- name: Restart zabbix agent2 service
+  shell: systemctl restart zabbix-agent2.service
+  when: result_image_names.rc != 0 or result_is_docker_container_available.rc != 0
