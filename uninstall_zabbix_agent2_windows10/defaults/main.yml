@@ -1,2 +1,2 @@
----
-# defaults file for uninstall_zabbix_agent2_windows10
+zabbix_url: "https://cdn.zabbix.com/zabbix/binaries/stable/7.0/7.0.3/zabbix_agent2-7.0.3-windows-amd64-openssl.msi"
+path_to_msi_package: C:\tmp\zabbix_agent2.msi

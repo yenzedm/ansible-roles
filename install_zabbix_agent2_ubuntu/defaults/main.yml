@@ -1,2 +1,1 @@
----
-# defaults file for install_zabbix_agent2_ubuntu
+zabbix_server: "ip"
