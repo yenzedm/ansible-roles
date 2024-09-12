@@ -27,11 +27,6 @@ Example Playbook
 Add to zabbix_agent2.conf
 
 UserParameter=docker.image_names,/path/to/image_names.py
-
-------------------
-
-Add to zabbix_agent2.conf
-
 UserParameter=docker.container.image_name[*],/path/to/is_docker_container_available.py $1
 
 ------------------
