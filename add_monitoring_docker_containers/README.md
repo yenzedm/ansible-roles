@@ -21,25 +21,33 @@ Example Playbook
       roles:
          - { role: 'add_monitoring_docker_containers' }
 
-Author Information
+# Author Information
 ------------------
 
-# Add to zabbix_agent2.conf
+Add to zabbix_agent2.conf
 
 UserParameter=docker.image_names,/path/to/image_names.py
 
-# Add to zabbix_agent2.conf
+------------------
+
+Add to zabbix_agent2.conf
 
 UserParameter=docker.container.image_name[*],/path/to/is_docker_container_available.py $1
 
-# Key for discovery rule
+------------------
+
+Key for discovery rule
 
 docker.image_names
 
-# Key for item prototype
+------------------
+
+Key for item prototype
 
 docker.container.image_name[{#NAME}]
 
-# Expression for trigger prototype
+------------------
+
+Expression for trigger prototype
 
 last(/hostname/docker.container.image_name[{#NAME}])=0
