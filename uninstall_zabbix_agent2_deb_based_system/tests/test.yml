@@ -1,0 +1,5 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - uninstall_zabbix_agent2_deb_based_system
