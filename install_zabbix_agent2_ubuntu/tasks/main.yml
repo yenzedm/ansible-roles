@@ -51,6 +51,10 @@
   shell: sed -i "s/^# HostMetadata=.*/HostMetadata=Linux/" /etc/zabbix/zabbix_agent2.conf
   when: zabbix_agent2_installed.rc != 0
 
+- name: Add docker group for zabbix user
+  shell: usermod -aG docker zabbix
+  when: zabbix_agent2_installed.rc != 0
+
 - name: Ensure Zabbix Agent 2 is enabled and started
   service:
     name: zabbix-agent2
