@@ -1,0 +1,36 @@
+---
+- block:
+    - name: get swap data
+      shell: swapon --show
+      register: swap_path
+
+    - name: get swap path
+      set_fact:
+        path_to_swap: "{{ swap_path.stdout_lines[1].split()[0] }}"
+
+    - name: pring swap path
+      debug:
+        var: path_to_swap
+
+    - name: check if a swap file exists
+      stat:
+        path: '{{ path_to_swap }}' 
+      register: file_exists
+
+    - name: disable swap
+      shell: swapoff -a
+      when: file_exists.stat.exists == true
+
+    - name: remove swapfile
+      file:
+        path: '{{ path_to_swap }}'
+        state: absent
+      when: file_exists.stat.exists == true
+
+    - name: remove swap from fstab
+      lineinfile:
+        path: /etc/fstab
+        regexp: '{{ path_to_swap }} none swap sw 0 0'
+        state: absent
+      when: file_exists.stat.exists == true
+  become: yes

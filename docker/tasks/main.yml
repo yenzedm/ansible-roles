@@ -1,0 +1,37 @@
+---
+- block:
+    - name: add GPG key for docker
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: add repository for docker
+      apt_repository:
+        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
+
+    - name: update cache
+      apt:
+        update_cache: yes
+
+    - name: install docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: check docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: add users to docker group
+      user:
+        name: user 
+        groups: docker
+        append: yes
+      
+    - name: install docker-compose
+      apt:
+        name: docker-compose, python3-pip
+        state: present
+  become: yes

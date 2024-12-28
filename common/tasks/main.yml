@@ -1,0 +1,55 @@
+---
+- name: update apt cache
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: set a hostname
+  hostname:
+    name: '{{ hostname }}'
+  become: yes
+
+- name: set timezone to Europe/Moscow
+  timezone:
+    name: '{{ timezone }}'
+
+- name: installation packages
+  apt:
+    name: '{{ item }}' 
+    state: present
+  become: yes
+  loop:
+    - '{{ packages }}'
+
+      # connect swap
+- block:
+    - name: create a swap file
+      shell: fallocate -l {{ swap_size }} /swapfile
+      args:
+        creates: '{{ path_to_swap }}'
+
+    - name: set the correct permissions
+      file:
+        path: '{{ path_to_swap }}'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: make the file a swap file
+      shell: mkswap '{{ path_to_swap }}'
+      when: ansible_facts.swapfree_mb == 0
+
+    - name: enable the swap file
+      shell: swapon '{{ path_to_swap }}'
+      when: ansible_facts.swapfree_mb == 0
+
+    - name: add swap file to fstab
+      mount:
+        name: none
+        src: '{{ path_to_swap }}'
+        fstype: swap
+        opts: sw
+        passno: 0
+        dump: 0
+        state: present
+  become: yes

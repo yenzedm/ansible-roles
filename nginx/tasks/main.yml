@@ -1,0 +1,36 @@
+- block:
+  - name: install nginx package от RedHat
+    yum:
+      name: nginx
+      state: present
+    when: ansible_os_family == "RedHat"
+  
+  - name: install nginx package on debian systems
+    apt:
+      name: nginx
+      state: present
+    when: ansible_os_family == "Debian"
+  
+  - name: ensure nginx is enabled and running
+    service:
+      name: nginx
+      state: started
+      enabled: true
+  
+  - name: disable default site if required
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    when: not nginx_default_sites_enabled
+  
+  - name: deploy nginx configuration file
+    template:
+      src: nginx.conf.j2
+      dest: "{{ nginx_conf_path }}"
+      owner: root
+      group: root
+      mode: '0644'
+      backup: yes
+    notify:
+      - reload nginx
+  become: yes
