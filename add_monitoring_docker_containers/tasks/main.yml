@@ -31,24 +31,20 @@
 - block:
   - name: Move image_names.py to server
     copy: src={{ image_names_path }} dest={{ dest }}
-    when: result_image_names.rc != 0
 
   - name: Add permissions for image_names.py
     shell: sudo chmod o+x "{{ dest }}"/image_names.py
-    when: result_image_names.rc != 0
 
   - name: Add user parameter docker.image_names in zabbix_agent
     shell: echo 'UserParameter=docker.image_names,{{ dest }}/image_names.py' >> /etc/zabbix/zabbix_agent2.conf
-    when: result_image_names.rc != 0
+  when: result_image_names.rc != 0
 
 - block:
   - name: Move is_docker_container_available.py to server
     copy: src={{ is_docker_container_available_path }} dest={{ dest }}
-    when: result_is_docker_container_available.rc != 0
 
   - name: Add permissions for is_docker_container_available.py
     shell: sudo chmod o+x "{{ dest }}"/is_docker_container_available.py
-    when: result_is_docker_container_available.rc != 0
 
   - name: Add user parameter docker.container.image_name in zabbix_agent
     shell: echo 'UserParameter=docker.container.image_name[*],{{ dest }}/is_docker_container_available.py $1' >> /etc/zabbix/zabbix_agent2.conf
