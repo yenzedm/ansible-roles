@@ -33,4 +33,4 @@
       backup: yes
     notify:
       - reload nginx
-  become: yes
+  become: true

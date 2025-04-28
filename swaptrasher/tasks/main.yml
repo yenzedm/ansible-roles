@@ -17,20 +17,19 @@
         path: '{{ path_to_swap }}' 
       register: file_exists
 
+- block:
     - name: disable swap
       shell: swapoff -a
-      when: file_exists.stat.exists == true
 
     - name: remove swapfile
       file:
         path: '{{ path_to_swap }}'
         state: absent
-      when: file_exists.stat.exists == true
 
     - name: remove swap from fstab
       lineinfile:
         path: /etc/fstab
         regexp: '{{ path_to_swap }} none swap sw 0 0'
         state: absent
-      when: file_exists.stat.exists == true
-  become: yes
+  when: file_exists.stat.exists == true
+  become: true
