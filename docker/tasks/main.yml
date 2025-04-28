@@ -1,5 +1,21 @@
 ---
 - block:
+    - name: check if Docker is already installed
+      shell: systemctl | grep docker.service
+      register: docker_check
+      ignore_errors: true
+    
+    - name: return docker status
+      debug:
+        msg: "Docker is already installed!"
+      when: docker_check.rc == 0
+
+    - name: return docker status
+      debug:
+        msg: "Docker is not install!"
+      when: docker_check.rc == 1
+
+- block:
     - name: add GPG key for docker
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
@@ -34,4 +50,5 @@
       apt:
         name: docker-compose, python3-pip
         state: present
-  become: yes
+  when: docker_check.rc != 0
+  become: true
