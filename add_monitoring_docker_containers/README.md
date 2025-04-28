@@ -21,7 +21,7 @@ Example Playbook
       roles:
          - { role: 'add_monitoring_docker_containers' }
 
-# Author Information
+# Role Information
 ------------------
 
 Add to zabbix_agent2.conf
