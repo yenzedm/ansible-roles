@@ -3,3 +3,7 @@
 swap_size: 1G
 timezone: Europe/Moscow
 path_to_swap: /swapfile
+packages:
+  - htop
+  - curl
+  - wget
