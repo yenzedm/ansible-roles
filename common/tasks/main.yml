@@ -1,25 +1,47 @@
 ---
+- name: Show all facts
+  debug:
+    var: ansible_facts
+  when: true
+
 - name: update apt cache
   apt:
     update_cache: yes
   become: yes
+  when: ansible_os_family == "Debian"
+
+- name: update dnf cache
+  dnf:
+    update_cache: yes
+  become: yes
+  when: ansible_os_family == "RED"
 
 - name: set a hostname
   hostname:
-    name: '{{ hostname }}'
+    name: '{{ inventory_hostname }}'
   become: yes
 
 - name: set timezone to Europe/Moscow
   timezone:
     name: '{{ timezone }}'
 
-- name: installation packages
+- name: installation packages deb
   apt:
     name: '{{ item }}' 
     state: present
   become: yes
   loop:
     - '{{ packages }}'
+  when: ansible_os_family == "Debian"
+
+- name: installation packages rpm
+  dnf:
+    name: '{{ item }}' 
+    state: present
+  become: yes
+  loop:
+    - '{{ packages }}'
+  when: ansible_os_family == "RED"
 
       # connect swap
 - block:
