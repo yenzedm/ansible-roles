@@ -1,35 +1,94 @@
 ---
-- block:
-    - name: get swap data
-      shell: swapon --show
-      register: swap_path
+- name: Get current swap information
+  block:
+    - name: Get all swap devices
+      shell: |
+        # Получаем все swap устройства, включая файлы и разделы
+        swapon --show=NAME,TYPE --noheadings 2>/dev/null || echo "NO_SWAP"
+      register: swap_devices_raw
+      changed_when: false
 
-    - name: get swap path
+    - name: Parse swap devices
       set_fact:
-        path_to_swap: "{{ swap_path.stdout_lines[1].split()[0] }}"
+        swap_devices: |
+          {% if swap_devices_raw.stdout != "NO_SWAP" and swap_devices_raw.stdout.strip() %}
+          {% set device_list = [] %}
+          {% for line in swap_devices_raw.stdout_lines %}
+          {% if line.strip() %}
+          {% set parts = line.strip().split() %}
+          {% if parts | length >= 2 %}
+          {{ device_list.append({"path": parts[0], "type": parts[1]}) }}
+          {% endif %}
+          {% endif %}
+          {% endfor %}
+          {{ device_list }}
+          {% else %}
+          []
+          {% endif %}
 
-    - name: pring swap path
+    - name: Display swap devices found
       debug:
-        var: path_to_swap
+        msg: "Found swap devices: {{ swap_devices }}"
+      when: swap_devices | length > 0
 
-    - name: check if a swap file exists
-      stat:
-        path: '{{ path_to_swap }}' 
-      register: file_exists
+    - name: Check if any swap exists
+      set_fact:
+        swap_exists: "{{ swap_devices | length > 0 }}"
+      when: swap_devices is defined
 
-- block:
-    - name: disable swap
+- name: Remove all swap devices
+  block:
+    - name: Disable all swap
       shell: swapoff -a
+      ignore_errors: yes
+      register: swapoff_result
+      changed_when: "'swapoff: swapoff failed' not in swapoff_result.stderr"
 
     - name: remove swapfile
       file:
         path: '{{ path_to_swap }}'
         state: absent
 
-    - name: remove swap from fstab
+    - name: Remove any swap entries from fstab (alternative method)
       lineinfile:
         path: /etc/fstab
-        regexp: '{{ path_to_swap }} none swap sw 0 0'
+        regexp: '^\s*[^#].*\s+swap\s+'
         state: absent
-  when: file_exists.stat.exists == true
+        backup: yes
+      ignore_errors: yes
+
+    - name: Remove swap partition entries from fstab
+      lineinfile:
+        path: /etc/fstab
+        regexp: '^\s*[^#].*swap.*defaults\s+0\s+0'
+        state: absent
+        backup: yes
+      ignore_errors: yes
+
+    - name: Verify swap is disabled
+      shell: |
+        # Проверяем что swap отключен
+        free -h | grep -i swap | awk '{print $2, $3}'
+      register: swap_check
+      changed_when: false
+
+    - name: Show swap status after removal
+      debug:
+        msg: |
+          Swap status after removal:
+          {{ swap_check.stdout }}
+          {% if '0B 0B' in swap_check.stdout or '0 0' in swap_check.stdout %}
+          ✅ Swap successfully disabled
+          {% else %}
+          ⚠️  Swap might still be active
+          {% endif %}
+
+  when: 
+    - swap_exists | default(false)
+    - swap_devices | length > 0
   become: true
+
+- name: Handle no swap case
+  debug:
+    msg: "No swap devices found. Nothing to remove."
+  when: not swap_exists | default(false)
