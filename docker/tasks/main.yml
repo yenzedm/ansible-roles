@@ -1,54 +1,122 @@
 ---
+# https://download.docker.com/linux/rhel/7/source/stable/Packages/ other packages for docker
+- name: Include OS-specific variables (modern way)
+  ansible.builtin.include_vars:
+    file: "{{ ansible_os_family }}.yml"
+  when: ansible_os_family in ['Debian', 'RED']
+  tags: always
+
+# ======= rpm based ============
 - block:
-    - name: check if Docker is already installed
-      shell: systemctl | grep docker.service
-      register: docker_check
-      ignore_errors: true
-    
-    - name: return docker status
-      debug:
-        msg: "Docker is already installed!"
-      when: docker_check.rc == 0
+  - name: Check if Docker is already installed
+    block:
+      - name: check if Docker is already installed
+        shell: rpm -qa | grep docker
+        register: docker_check
+        ignore_errors: true
 
-    - name: return docker status
-      debug:
-        msg: "Docker is not install!"
-      when: docker_check.rc == 1
+      - name: Return docker status
+        debug:
+          msg: "Docker is already installed!"
+        when: docker_check.rc == 0
 
-- block:
-    - name: add GPG key for docker
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
+      - name: Return docker status
+        debug:
+          msg: "Docker is not install!"
+        when: docker_check.rc == 1
 
-    - name: add repository for docker
-      apt_repository:
-        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
+  - name: Install prerequisites
+    ansible.builtin.dnf:
+      name:
+        - dnf-utils
+        - ca-certificates
+      state: present
 
-    - name: update cache
-      apt:
-        update_cache: yes
+  - name: Add repo
+    shell: "sudo dnf config-manager --add-repo {{ docker_yum_repo_url }}"
+    when: docker_check.rc != 0
 
-    - name: install docker
-      apt:
-        name: docker-ce
-        state: present
+  - name: Install docker specific version or latest
+    block:
+      - name: Get available versions
+        shell: dnf list docker-ce --showduplicates | sort -r
+        register: versions_output
+  
+      - name: Show versions and wait for input
+        pause:
+          prompt: "Available versions:\n{{ versions_output.stdout }}\n\nPlease enter the version you want to use. Example: 4:25.0.7-4.el7 or latest"
+        register: version_input
+  
+      - name: Use selected version
+        debug:
+          msg: "You selected version: {{ version_input.user_input }}"
 
-    - name: check docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
+      - name: Install selected version
+        dnf:
+          name:
+            - "docker-ce-{{ version_input.user_input }}"
+            - "docker-ce-cli-{{ version_input.user_input }}"
+          state: present
+        when: version_input.user_input != "latest"
 
-    - name: add users to docker group
-      user:
-        name: user 
-        groups: docker
-        append: yes
-      
-    - name: install docker-compose
-      apt:
-        name: docker-compose, python3-pip
-        state: present
-  when: docker_check.rc != 0
-  become: true
+      - name: Install latest version
+        dnf:
+          name:
+            - docker-ce
+            - docker-ce-cli
+          state: present
+        when: version_input.user_input == "latest"
+    become: yes
+    when: docker_check.rc != 0
+
+  - name: Install docker compose plugin specific version or latest
+    block:
+      - name: Wait input version
+        pause:
+          prompt: "Please enter the version from {{ github_docker_compose_plugin }} that you want to use. Example: v2.40.3 or latest"
+        register: version_input
+
+      - name: Use selected version
+        debug:
+          msg: "You selected version: {{ version_input.user_input }}"
+
+      - name: Create dir for docker compose plugin
+        file:
+          path: /usr/local/lib/docker/cli-plugins
+          state: directory
+          owner: root
+          group: root
+          mode: '0755'
+
+      - name: Download and install selected version
+        get_url:
+          url: "{{ github_docker_compose_plugin }}/download/{{ version_input.user_input }}/docker-compose-linux-{{ ansible_userspace_architecture }}"
+          dest: /usr/local/lib/docker/cli-plugins/docker-compose
+          mode: '0755'
+          owner: root
+          group: root
+        when: version_input.user_input != "latest"
+ 
+      - name: Get latest release
+        shell: curl -s {{ latest_release }} | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+        register: compose_latest
+        when: version_input.user_input == "latest"
+
+      - name: Download and install latest version
+        get_url:
+          url: "{{ github_docker_compose_plugin }}/download/{{ compose_latest.stdout }}/docker-compose-linux-{{ ansible_userspace_architecture }}"
+          dest: /usr/local/lib/docker/cli-plugins/docker-compose
+          mode: '0755'
+          owner: root
+          group: root
+        when: version_input.user_input == "latest"
+    become: yes
+    when: docker_check.rc != 0
+
+  - name: Add user to docker group
+    user:
+      name: "{{ ansible_user }}"
+      groups: docker
+      append: yes
+  when: ansible_os_family == "RED" 
+# ==================================

@@ -1,2 +1,8 @@
 ---
-# defaults file for docker
+# Добавлять пользователя в группу docker (по умолчанию текущий ansible_user, можно переопределить)
+docker_users:
+  - "{{ ansible_user | default('root') }}"
+
+# docker compose plugin
+github_docker_compose_plugin: https://github.com/docker/compose/releases
+latest_release: https://api.github.com/repos/docker/compose/releases/latest
