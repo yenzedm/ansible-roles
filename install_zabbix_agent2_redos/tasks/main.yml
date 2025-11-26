@@ -1,0 +1,50 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: check zabbix_agent2
+  block:
+    - name: check if zabbix_agent2 is already installed
+      shell: rpm -qa | grep zabbix-agent2
+      register: zabbix_agent2_installed
+      ignore_errors: true
+
+    - name: return zabbix_agent2 status
+      debug:
+        msg: "zabbix_agent2 is already installed!"
+      when: zabbix_agent2_installed.rc == 0
+
+    - name: return zabbix_agent2 status
+      debug:
+        msg: "zabbix_agent2 is not install!"
+      when: zabbix_agent2_installed.rc == 1
+
+- name: install and configure zabbix_agent2
+  block:
+    - name: Install zabbix_agent2
+      dnf:
+        name:
+          - zabbix-agent2
+        state: present
+
+    - name: Add zabbix server to zabbix_agent2.conf for passive
+      shell: sed -i "s/^Server=.*/Server={{ zabbix_server }}/" /etc/zabbix/zabbix_agent2.conf
+
+    - name: Add zabbix server to zabbix_agent2.conf for active
+      shell: sed -i "s/^ServerActive=.*/ServerActive={{ zabbix_server }}/" /etc/zabbix/zabbix_agent2.conf
+
+    - name: Add hostname to zabbix_agent2.conf
+      shell: sed -i "s/^Hostname=.*/Hostname=$(hostname)/" /etc/zabbix/zabbix_agent2.conf
+
+    - name: Add metadata to zabbix_agent2.conf
+      shell: sed -i "s/^# HostMetadata=.*/HostMetadata=Linux/" /etc/zabbix/zabbix_agent2.conf
+
+    - name: Add docker group for zabbix user
+      shell: usermod -aG docker zabbix
+
+    - name: Ensure Zabbix Agent 2 is enabled and started
+      service:
+        name: zabbix-agent2
+        enabled: yes
+        state: restarted
+  when: zabbix_agent2_installed.rc != 0
+  become: true
+    

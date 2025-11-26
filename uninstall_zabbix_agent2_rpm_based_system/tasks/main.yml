@@ -1,0 +1,24 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: check zabbix_agent2
+  block:
+    - name: check if zabbix_agent2 is already installed
+      shell: rpm -qa | grep zabbix-agent2
+      register: zabbix_agent2_installed
+      ignore_errors: true
+
+    - name: return zabbix_agent2 status
+      debug:
+        msg: "zabbix_agent2 is already installed!"
+      when: zabbix_agent2_installed.rc == 0
+
+    - name: return zabbix_agent2 status
+      debug:
+        msg: "zabbix_agent2 is not install!"
+      when: zabbix_agent2_installed.rc == 1
+
+- name: uninstall zabbix-agent2
+  dnf:
+    name: zabbix-agent2
+    state: absent
+  when: zabbix_agent2_installed.rc == 0
