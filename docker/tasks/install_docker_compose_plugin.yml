@@ -1,0 +1,22 @@
+- name: Install docker compose plugin specific version or latest
+  block:
+    - name: Create dir for docker compose plugin
+      file:
+        path: /usr/local/lib/docker/cli-plugins
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+ 
+    - name: Get latest release
+      shell: curl -s {{ latest_release }} | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+      register: compose_latest
+
+    - name: Download and install latest version
+      get_url:
+        url: "{{ github_docker_compose_plugin }}/download/{{ compose_latest.stdout }}/docker-compose-linux-{{ ansible_userspace_architecture }}"
+        dest: /usr/local/lib/docker/cli-plugins/docker-compose
+        mode: '0755'
+        owner: root
+        group: root
+  become: yes

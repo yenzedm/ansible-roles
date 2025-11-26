@@ -1,122 +1,177 @@
 ---
-# https://download.docker.com/linux/rhel/7/source/stable/Packages/ other packages for docker
-- name: Include OS-specific variables (modern way)
-  ansible.builtin.include_vars:
-    file: "{{ ansible_os_family }}.yml"
-  when: ansible_os_family in ['Debian', 'RED']
-  tags: always
-
-# ======= rpm based ============
-- block:
-  - name: Check if Docker is already installed
+# \========== rpm based ===============
+- name: rpm based
+  block:
+  - name: delete all old docker packages
     block:
-      - name: check if Docker is already installed
+      - name: if yes docker
+        dnf:
+          name:
+            - docker
+            - docker-client
+            - docker-client-latest
+            - docker-common
+            - docker-latest
+            - docker-latest-logrotate
+            - docker-logrotate
+            - docker-engine
+            - podman
+            - runc
+            - docker-ce
+            - docker-ce-cli
+          state: absent
+
+      - name: if yes docker plugin
+        file:
+          path: /usr/local/lib/docker/cli-plugins/docker-compose 
+          state: absent
+
+  - name: check docker
+    block:
+      - name: check if docker is already installed
         shell: rpm -qa | grep docker
         register: docker_check
         ignore_errors: true
 
-      - name: Return docker status
+      - name: return docker status
         debug:
           msg: "Docker is already installed!"
         when: docker_check.rc == 0
 
-      - name: Return docker status
+      - name: return docker status
         debug:
           msg: "Docker is not install!"
         when: docker_check.rc == 1
 
-  - name: Install prerequisites
-    ansible.builtin.dnf:
-      name:
-        - dnf-utils
-        - ca-certificates
-      state: present
-
-  - name: Add repo
-    shell: "sudo dnf config-manager --add-repo {{ docker_yum_repo_url }}"
-    when: docker_check.rc != 0
-
-  - name: Install docker specific version or latest
+  - name: others
     block:
-      - name: Get available versions
-        shell: dnf list docker-ce --showduplicates | sort -r
-        register: versions_output
-  
-      - name: Show versions and wait for input
-        pause:
-          prompt: "Available versions:\n{{ versions_output.stdout }}\n\nPlease enter the version you want to use. Example: 4:25.0.7-4.el7 or latest"
-        register: version_input
-  
-      - name: Use selected version
-        debug:
-          msg: "You selected version: {{ version_input.user_input }}"
-
-      - name: Install selected version
+      - name: install prerequisites
         dnf:
           name:
-            - "docker-ce-{{ version_input.user_input }}"
-            - "docker-ce-cli-{{ version_input.user_input }}"
+            - dnf-utils
+            - ca-certificates
           state: present
-        when: version_input.user_input != "latest"
 
-      - name: Install latest version
-        dnf:
+      - name: add repo
+        shell: "sudo dnf config-manager --add-repo {{ docker_yum_repo_url }}"  
+    when: docker_check.rc != 0
+
+  - name: install latest version
+    dnf:
+      name:
+        - docker-ce
+        - docker-ce-cli
+      state: present
+    become: yes
+    when: docker_check.rc != 0
+  
+  - name: install docker compose plugin
+    include_tasks: install_docker_compose_plugin.yml
+    when: docker_check.rc != 0
+
+  when: ansible_os_family == "RED"
+#======= rpm based ============/
+#\========== deb based ===============
+- name: deb based
+  block:
+  - name: delete all old packages
+    block:
+      - name: if yes docker
+        apt:
+          name:
+            - docker.io
+            - docker-compose
+            - docker-compose-v2
+            - docker-doc
+            - podman-docker
+            - containerd
+            - runc
+            - docker-ce
+            - docker-ce-cli
+          state: absent
+
+      - name: if yes docker plugin
+        file:
+          path: /usr/local/lib/docker/cli-plugins/docker-compose 
+          state: absent
+
+  - name: check docker 
+    block:
+      - name: check if docker is already installed
+        shell: systemctl | grep docker.service
+        register: docker_check
+        ignore_errors: true
+
+      - name: return docker status
+        debug:
+          msg: "Docker is already installed!"
+        when: docker_check.rc == 0
+
+      - name: return docker status
+        debug:
+          msg: "Docker is not install!"
+        when: docker_check.rc == 1
+
+  - name: others
+    block:
+      - name: install prerequisites
+        apt:
+          name:
+            - ca-certificates
+            - curl
+            - gnupg
+            - lsb-release
+          state: present
+
+      - name: add GPG key for docker
+        shell: |
+          install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL {{ docker_apt_repo_url }}{{ ansible_facts.distribution | lower }}/gpg -o /etc/apt/keyrings/docker.asc
+          chmod a+r /etc/apt/keyrings/docker.asc
+        become: yes
+
+      - name: create file for docker repo
+        file:
+          path: /etc/apt/sources.list.d/docker.sources
+          state: touch
+          mode: u=rw,g=r,o=r
+
+      - name: content for docker repo
+        copy:
+          dest: /etc/apt/sources.list.d/docker.sources
+          content: |
+            Types: deb
+            URIs: {{ docker_apt_repo_url }}{{ ansible_facts.distribution | lower }}
+            Suites: {{ ansible_facts.distribution_release}}
+            Components: stable
+            Signed-By: /etc/apt/keyrings/docker.asc 
+
+      - name: update cache
+        apt:
+          update_cache: yes
+    when: docker_check.rc != 0
+
+  - name: install docker specific version or latest
+    block:
+      - name: install latest version
+        apt:
           name:
             - docker-ce
             - docker-ce-cli
           state: present
-        when: version_input.user_input == "latest"
     become: yes
     when: docker_check.rc != 0
-
-  - name: Install docker compose plugin specific version or latest
-    block:
-      - name: Wait input version
-        pause:
-          prompt: "Please enter the version from {{ github_docker_compose_plugin }} that you want to use. Example: v2.40.3 or latest"
-        register: version_input
-
-      - name: Use selected version
-        debug:
-          msg: "You selected version: {{ version_input.user_input }}"
-
-      - name: Create dir for docker compose plugin
-        file:
-          path: /usr/local/lib/docker/cli-plugins
-          state: directory
-          owner: root
-          group: root
-          mode: '0755'
-
-      - name: Download and install selected version
-        get_url:
-          url: "{{ github_docker_compose_plugin }}/download/{{ version_input.user_input }}/docker-compose-linux-{{ ansible_userspace_architecture }}"
-          dest: /usr/local/lib/docker/cli-plugins/docker-compose
-          mode: '0755'
-          owner: root
-          group: root
-        when: version_input.user_input != "latest"
+  
+  - name: install docker compose plugin
+    include_tasks: install_docker_compose_plugin.yml
+    when: docker_check.rc != 0
  
-      - name: Get latest release
-        shell: curl -s {{ latest_release }} | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
-        register: compose_latest
-        when: version_input.user_input == "latest"
-
-      - name: Download and install latest version
-        get_url:
-          url: "{{ github_docker_compose_plugin }}/download/{{ compose_latest.stdout }}/docker-compose-linux-{{ ansible_userspace_architecture }}"
-          dest: /usr/local/lib/docker/cli-plugins/docker-compose
-          mode: '0755'
-          owner: root
-          group: root
-        when: version_input.user_input == "latest"
-    become: yes
-    when: docker_check.rc != 0
-
-  - name: Add user to docker group
-    user:
-      name: "{{ ansible_user }}"
-      groups: docker
-      append: yes
-  when: ansible_os_family == "RED" 
-# ==================================
+  when: ansible_os_family == "Debian"
+# ========== deb based ===============\
+# \========== for all ==============
+- name: add user to docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+#========== for all ==============\
