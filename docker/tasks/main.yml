@@ -4,7 +4,7 @@
   block:
   - name: delete all old docker packages
     block:
-      - name: if yes docker
+      - name: delete all old docker packages
         dnf:
           name:
             - docker
@@ -21,7 +21,7 @@
             - docker-ce-cli
           state: absent
 
-      - name: if yes docker plugin
+      - name: delete old docker compose plugin
         file:
           path: /usr/local/lib/docker/cli-plugins/docker-compose 
           state: absent
@@ -74,9 +74,9 @@
 #\========== deb based ===============
 - name: deb based
   block:
-  - name: delete all old packages
+  - name: delete all old docker packages
     block:
-      - name: if yes docker
+      - name: delete all old docker packages
         apt:
           name:
             - docker.io
@@ -90,7 +90,7 @@
             - docker-ce-cli
           state: absent
 
-      - name: if yes docker plugin
+      - name: delete old docker compose plugin
         file:
           path: /usr/local/lib/docker/cli-plugins/docker-compose 
           state: absent
