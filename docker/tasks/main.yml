@@ -62,6 +62,12 @@
         - docker-ce
         - docker-ce-cli
       state: present
+
+  - name: run docker systemd service
+    systemd_service:
+      name: docker
+      state: started
+
     become: yes
     when: docker_check.rc != 0
   
@@ -151,7 +157,7 @@
           update_cache: yes
     when: docker_check.rc != 0
 
-  - name: install docker specific version or latest
+  - name: install docker latest version
     block:
       - name: install latest version
         apt:
@@ -159,9 +165,15 @@
             - docker-ce
             - docker-ce-cli
           state: present
+
+      - name: run docker systemd service
+        systemd_service:
+          name: docker
+          state: started
+        
     become: yes
     when: docker_check.rc != 0
-  
+ 
   - name: install docker compose plugin
     include_tasks: install_docker_compose_plugin.yml
     when: docker_check.rc != 0
