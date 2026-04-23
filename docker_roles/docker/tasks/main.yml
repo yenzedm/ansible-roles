@@ -2,29 +2,29 @@
 # \========== rpm based ===============
 - name: rpm based
   block:
-  - name: delete all old docker packages
-    block:
-      - name: delete all old docker packages
-        dnf:
-          name:
-            - docker
-            - docker-client
-            - docker-client-latest
-            - docker-common
-            - docker-latest
-            - docker-latest-logrotate
-            - docker-logrotate
-            - docker-engine
-            - podman
-            - runc
-            - docker-ce
-            - docker-ce-cli
-          state: absent
+  # - name: delete all old docker packages
+  #   block:
+  #     - name: delete all old docker packages
+  #       dnf:
+  #         name:
+  #           - docker
+  #           - docker-client
+  #           - docker-client-latest
+  #           - docker-common
+  #           - docker-latest
+  #           - docker-latest-logrotate
+  #           - docker-logrotate
+  #           - docker-engine
+  #           - podman
+  #           - runc
+  #           - docker-ce
+  #           - docker-ce-cli
+  #         state: absent
 
-      - name: delete old docker compose plugin
-        file:
-          path: /usr/local/lib/docker/cli-plugins/docker-compose 
-          state: absent
+  #     - name: delete old docker compose plugin
+  #       file:
+  #         path: /usr/local/lib/docker/cli-plugins/docker-compose 
+  #         state: absent
 
   - name: check docker
     block:
@@ -80,26 +80,26 @@
 #\========== deb based ===============
 - name: deb based
   block:
-  - name: delete all old docker packages
-    block:
-      - name: delete all old docker packages
-        apt:
-          name:
-            - docker.io
-            - docker-compose
-            - docker-compose-v2
-            - docker-doc
-            - podman-docker
-            - containerd
-            - runc
-            - docker-ce
-            - docker-ce-cli
-          state: absent
+  # - name: delete all old docker packages
+  #   block:
+  #     - name: delete all old docker packages
+  #       apt:
+  #         name:
+  #           - docker.io
+  #           - docker-compose
+  #           - docker-compose-v2
+  #           - docker-doc
+  #           - podman-docker
+  #           - containerd
+  #           - runc
+  #           - docker-ce
+  #           - docker-ce-cli
+  #         state: absent
 
-      - name: delete old docker compose plugin
-        file:
-          path: /usr/local/lib/docker/cli-plugins/docker-compose 
-          state: absent
+  #     - name: delete old docker compose plugin
+  #       file:
+  #         path: /usr/local/lib/docker/cli-plugins/docker-compose 
+  #         state: absent
 
   - name: check docker 
     block:
