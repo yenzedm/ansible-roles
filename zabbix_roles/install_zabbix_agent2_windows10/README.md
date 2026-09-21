@@ -36,3 +36,13 @@ Author Information
 ------------------
 
 An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+
+Useful commands
+---
+
+Get-Service -Name "Zabbix Agent", "Zabbix Agent 2" -ErrorAction SilentlyContinue - check service  
+
+head -n1 $(which ansible)  
+<output of commands above> -c "import winrm; print('pywinrm installed')"  
+
+ansible -m win_ping monitoring-host2  
