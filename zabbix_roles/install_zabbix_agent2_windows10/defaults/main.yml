@@ -1,3 +1,6 @@
 zabbix_server: ip
 zabbix_url: "https://cdn.zabbix.com/zabbix/binaries/stable/7.0/7.0.3/zabbix_agent2-7.0.3-windows-amd64-openssl.msi"
 path_to_msi_package: C:\tmp\zabbix_agent2.msi
+host_meta_data: Win
+install_folder: C:\zabbix_agent2
+log_file: C:\logs\install_agent2.log

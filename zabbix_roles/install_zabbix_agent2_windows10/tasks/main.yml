@@ -26,7 +26,7 @@
 - name: Install Zabbix Agent 2
   win_package:
     path: C:\tmp\zabbix_agent2.msi
-    arguments: 'SERVER={{ zabbix_server }} SERVERACTIVE={{ zabbix_server }} HOSTNAME={{ inventory_hostname }} HOSTMETADATA=Win INSTALLFOLDER="C:\zabbix_agent2" CONFIGURE_FIREWALL=1 START=1 /log C:\logs\install_agent2.log'
+    arguments: 'SERVER={{ zabbix_server }} SERVERACTIVE={{ zabbix_server }} HOSTNAME={{ inventory_hostname }} HOSTMETADATA={{ host_meta_data }} INSTALLFOLDER={{ install_folder }} CONFIGURE_FIREWALL=1 START=1 /log {{ log_file }}'
     state: present
   when: zabbix_service_info.exists == false
 
