@@ -1,0 +1,53 @@
+---
+# - name: Test
+#   block:
+#     - name: Create dir /opt/docker
+#       file:
+#         path: /opt/docker
+#         state: directory
+        
+#     - name: Create dir /opt/system
+#       file:
+#         path: /opt/system
+#         state: directory
+#   become: yes
+
+- name: Install docker static specific version
+  block:
+    - name: "Download tgz from docker github to {{ docker_dir }}"
+      unarchive:
+        src: "{{ docker_repo }}{{ os_architecture }}/docker-{{ docker_version }}.tgz"
+        dest: "{{ docker_dir }}"
+        remote_src: true
+        extra_opts:
+          - --strip-components=1
+
+    - name: Create docker group
+      group:
+        name: docker
+        state: present
+        
+    - name: "Add {{ ansible_user }} to docker group"
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: "Copy all file from files/ to {{ path_to_systemd }}"
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ path_to_systemd }}/{{ item.path }}"
+        owner: root
+        group: root
+        mode: '0644'
+      with_filetree: "{{ role_path }}/files/"
+      when: item.state == 'file'
+
+    - name: Run docker systemd
+      shell: |
+        sudo systemctl daemon-reload
+        sudo systemctl start containerd.service
+        sudo systemctl start docker.service
+        sudo systemctl enable containerd.service
+        sudo systemctl enable docker.service
+  become: yes

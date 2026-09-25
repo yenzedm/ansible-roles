@@ -1,0 +1,9 @@
+---
+docker_repo: "https://download.docker.com/linux/static/stable/"
+docker_version: "18.09.0"
+os_architecture: "x86_64"
+docker_dir: "/usr/local/sbin"
+
+# redos
+path_to_systemd: /usr/lib/systemd/system
+  
