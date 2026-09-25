@@ -44,10 +44,22 @@
       when: item.state == 'file'
 
     - name: Run docker systemd
-      shell: |
-        sudo systemctl daemon-reload
-        sudo systemctl start containerd.service
-        sudo systemctl start docker.service
-        sudo systemctl enable containerd.service
-        sudo systemctl enable docker.service
+      systemd_service:
+        name: docker
+        state: started
+        enabled: yes
+        daemon_reload: yes
+        
+    - name: Run containerd systemd
+      systemd_service:
+        name: containerd
+        state: started
+        enabled: yes
+    # - name: Run docker systemd
+    #   shell: |
+    #     sudo systemctl daemon-reload
+    #     sudo systemctl start containerd.service
+    #     sudo systemctl start docker.service
+    #     sudo systemctl enable containerd.service
+    #     sudo systemctl enable docker.service
   become: yes
