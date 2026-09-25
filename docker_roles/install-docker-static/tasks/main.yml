@@ -1,17 +1,4 @@
 ---
-# - name: Test
-#   block:
-#     - name: Create dir /opt/docker
-#       file:
-#         path: /opt/docker
-#         state: directory
-        
-#     - name: Create dir /opt/system
-#       file:
-#         path: /opt/system
-#         state: directory
-#   become: yes
-
 - name: Install docker static specific version
   block:
     - name: "Download tgz from docker github to {{ docker_dir }}"
@@ -33,7 +20,7 @@
         groups: docker
         append: yes
 
-    - name: "Copy all file from files/ to {{ path_to_systemd }}"
+    - name: "Copy all file from install-docker-static/files/ to {{ path_to_systemd }}"
       copy:
         src: "{{ item.src }}"
         dest: "{{ path_to_systemd }}/{{ item.path }}"
@@ -55,11 +42,4 @@
         name: containerd
         state: started
         enabled: yes
-    # - name: Run docker systemd
-    #   shell: |
-    #     sudo systemctl daemon-reload
-    #     sudo systemctl start containerd.service
-    #     sudo systemctl start docker.service
-    #     sudo systemctl enable containerd.service
-    #     sudo systemctl enable docker.service
   become: yes
