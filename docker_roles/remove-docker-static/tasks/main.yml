@@ -1,0 +1,47 @@
+---
+- name: Install docker static specific version
+  block:
+    - name: Stop docker.service
+      systemd:
+        name: docker
+        state: stopped
+      ignore_errors: true
+
+    - name: Stop containerd.service
+      systemd:
+        name: containerd
+        state: stopped
+      ignore_errors: true
+
+    - name: "Delete unit-files from {{ path_to_systemd }}"
+      file:
+        path: "{{ path_to_systemd }}/{{ item }}"
+        state: absent
+      loop:
+        - docker.service
+        - containerd.service
+        - docker.socket
+
+    - name: Reload conf systemd
+      systemd:
+        daemon_reload: true
+        
+    - name: "Remove docker bin files from {{ path_to_docker_bin }}"
+      file:
+        path: "{{ path_to_docker_bin }}/{{ item }}"
+        state: absent
+      loop:
+        - containerd
+        - containerd-shim-runc-v2
+        - ctr
+        - docker
+        - dockerd
+        - docker-init
+        - docker-proxy
+        - runc
+
+    - name: Remove containerd from /opt
+      file:
+        path: /opt/containerd
+        state: absent
+  become: yes

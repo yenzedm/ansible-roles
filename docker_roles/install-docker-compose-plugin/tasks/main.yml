@@ -1,0 +1,28 @@
+---
+- name: "Ensure that the {{ docker_compose_plugin_dir }} exists"
+  ansible.builtin.file:
+    path: "{{ docker_compose_plugin_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Check installed or not docker compose plugin
+  ansible.builtin.command:
+    cmd: "docker compose version"
+  register: docker_compose_check
+  failed_when: false
+  changed_when: false
+
+- name: "Download docker compose {{ docker_compose_version }} like plugin"
+  ansible.builtin.get_url:
+    url: "{{ docker_compose_url }}"
+    dest: "{{ docker_compose_install_path }}"
+    mode: '0755'
+    owner: root
+    group: root
+    force: true
+  when: >
+    docker_compose_check.rc != 0 or
+    docker_compose_version not in docker_compose_check.stdout
+  notify: "Docker Compose installed"

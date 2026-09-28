@@ -31,14 +31,14 @@
       when: item.state == 'file'
 
     - name: Run docker systemd
-      systemd_service:
+      systemd:
         name: docker
         state: started
         enabled: yes
         daemon_reload: yes
         
     - name: Run containerd systemd
-      systemd_service:
+      systemd:
         name: containerd
         state: started
         enabled: yes

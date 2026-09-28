@@ -1,0 +1,5 @@
+---
+path_to_docker_bin: /usr/local/sbin
+  
+# redos
+path_to_systemd: /usr/lib/systemd/system

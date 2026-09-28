@@ -1,0 +1,17 @@
+---
+docker_compose_version: "v5.0.2"
+
+# Каталог для CLI-плагинов Docker
+docker_compose_plugin_dir: "/usr/libexec/docker/cli-plugins"
+
+# Имя файла плагина (важно: именно docker-compose, без расширений)
+docker_compose_plugin_name: "docker-compose"
+
+# Полный путь к плагину
+docker_compose_install_path: "{{ docker_compose_plugin_dir }}/{{ docker_compose_plugin_name }}"
+
+# Архитектура для имени файла в релизе
+docker_compose_arch: "{{ ansible_architecture }}"
+
+# URL для скачивания
+docker_compose_url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-{{ docker_compose_arch }}"
