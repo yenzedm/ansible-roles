@@ -1,0 +1,60 @@
+# @eremeev.da
+---
+update_version: "25092026"
+path_to_distrib: "/opt/distrib"
+update_debug: false
+custom_path: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+bak_dir: "images-bak"
+bak_version: "25092026"
+bak: true
+delete_images: false
+update_initi: true
+solodb:
+  update_initi: true
+  bak: false
+  script_name: "solodb.sh"
+  container_name: "solodb"
+gui:
+  update_initi: true
+  bak: false
+  script_name: "gui.sh"
+  container_name: "gui"
+platform:
+  update_initi: true
+  bak: false
+  script_name: "platform.sh"
+  container_name: "platform"
+collectors:
+  script_name: "collector.sh"
+  update_initi: true
+  bak: true
+  type:
+    - collector_type: "snmp"
+      update_initi: false
+      bak: false
+      container_name: "snmp_collector"
+    - collector_type: "cli"
+      update_initi: true
+      bak: true
+      container_name: "cli_collector"
+    - collector_type: "http"
+      update_initi: false
+      bak: false
+      container_name: "http_collector"
+    - collector_type: "probe"
+      update_initi: false
+      bak: false
+      container_name: "probe_collector"
+    - collector_type: "flow"
+      update_initi: false
+      bak: false
+      container_name: "flow_collector"
+    - collector_type: "iec"
+      update_initi: false
+      bak: false
+      container_name: "iec_collector"
+integration:
+  update_initi: true
+  bak: true
+  script_name: "integration.sh" 
+  container_name: "int"

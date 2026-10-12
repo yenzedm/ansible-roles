@@ -1,0 +1,196 @@
+version = "3.0.6";
+xxcFileName = "collector.xxc";
+
+id = "{{ collector.id }}";
+group = "{{ collector.group }}";
+name = "{{ collector.name }}";
+
+customPropertiesFileName = "customProbeCollector.conf";
+
+//============== POOL SIZE ====================================
+dispatcherPoolSize = 10;
+systemPoolSize = 6;
+enableGarbageCollector = true;
+garbageCollectorPeriod = TimeDiff[0 00:05:00 0];
+
+//============== LANGUGE =======================================
+defaultLocale = "en"; //#codeCleanup
+//============== TCP CLIENT ====================================
+ip = "{{ platform.ip }}";
+port = 2612;
+//#codeCleanup
+reconnectPeriod = TimeDiff[0 00:00:05 0];
+
+connectionAttempts = 5;
+reserveAddresses = Vector(Pair(String, Integer))[Pair(String, Integer)["0.0.0.0", 2622]];
+//#codeCleanup
+statisticsPeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+hostDetailsUpdatePeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+keepAlivePeriod = TimeDiff[0 00:10:00 0];
+token = "TaINqpkkHq1eGuzqnOxvxno0FllVjNwMRjRRW5wacRS0aQKrLLNXp7HOpFjpVA9x";
+//#codeCleanup
+availableInterfaces = Vector(VariableContainer)[];
+
+//============= COLLECTORS ==================================
+icmpLibPath = "libsolo-icmp";
+sapLibPath = "libsolo-sapnw";
+scanLibPath = "libsolo-portscan";
+ldapLibPath = "libsolo-ldap";
+cliLibPath = "libsolo-cli";
+snmpLibPath = "libsolo-snmp";
+iperfLibPath = "libsolo-iperf";
+
+collectors = Map(String, String)["probe" : "oProbeCollector"];
+// Dictionaries from core
+dictionaries = Set(Vector(String))[
+    Vector(String)["Enums", "probeExitCodes"],
+];
+//#codeCleanup
+maxModelDiscoveryTime = TimeDiff[0 01:00:00 0];
+shortJobStartDelay = TimeDiff[0 00:00:30 0];
+longJobStartDelay = TimeDiff[0 00:01:00 0];
+//#codeCleanup
+minimalStartDelay = TimeDiff[0 00:00:30 0];
+
+//#codeCleanup
+icmpMinDelay = TimeDiff[0 00:00:01 0];
+tracerouteMinDelay = TimeDiff[0 00:00:01 0];
+
+//#codeCleanup
+sapPoolSize = 32;
+//#codeCleanup
+icmpPoolSize = 4;
+//#codeCleanup
+icmpConcurentJobs = 128;
+//#codeCleanup
+icmpHost = "0.0.0.0";
+//#codeCleanup
+icmpPort = 0;
+//#codeCleanup
+// icmpDevice = "lo";
+//#codeCleanup
+// icmpIpv6 = true;
+//#codeCleanup
+scanDevice = "ens33";
+//#codeCleanup
+ldapPoolSize = 4;
+//#codeCleanup
+probeJournalingMode = 2; //#codeCleanup
+//#codeCleanup
+diskFileChunkSize = 512000;
+//============= TLS ==================================
+//#codeCleanup
+caFile = "/etc/ssl/certs/ca-certificates.crt";
+//#codeCleanup
+caPath = "/etc/ssl/certs/";
+// ================= SNMP ============================
+// SNMP Additions for ICMP
+//#codeCleanup
+// icmpDevice = "lo";
+//#codeCleanup
+// icmpIpv6 = true;
+//#codeCleanup
+icmpUnlockJobMinDelay = TimeDiff[0 00:00:15 0];
+//#codeCleanup
+icmpMinDelayPart = 0.2;
+//#codeCleanup
+snmpPoolSize = 8;
+//#codeCleanup
+snmpConcurentJobs = 128;
+//#codeCleanup
+snmpHost = "0.0.0.0";
+//#codeCleanup
+snmpPort = 0;
+//#codeCleanup
+// snmpIpv6 = true;
+//#codeCleanup
+// snmpDevice = "lo";
+//#codeCleanup
+maxRecords = 30;
+//#codeCleanup
+pollMaxRecords = 30;
+//#codeCleanup
+modelFlowControlPackSize = 20;
+//#codeCleanup
+maxRepetitions = 8;
+//#codeCleanup
+snmpUnlockJobMinDelay = TimeDiff[0 00:02:00 0];
+//#codeCleanup
+snmpMinDelayPart = 0.2;
+//#codeCleanup
+shortJobStartDelay = TimeDiff[0 00:00:30 0];
+//#codeCleanup
+longJobStartDelay = TimeDiff[0 00:01:00 0];
+// Current time zone in minutes
+timeZoneOffset = -180;
+
+// ================= SNMP TRAPS ============================
+//#codeCleanup
+snmpTrapHost = "0.0.0.0";
+//#codeCleanup
+snmpTrapPort = 162;
+//#codeCleanup
+// snmpTrapIpv6 = true;
+//#codeCleanup
+// snmpTrapDevice = "lo";
+//#codeCleanup
+snmpTrapEngineId = "80001f8804307830313233343030303031";
+//#codeCleanup
+snmpTrapDefaultAuthProfile = "standartSnmp";
+//#codeCleanup
+snmpTrapAuthMap = Map(String, String)[];
+//#codeCleanup
+snmpTrapHandlers = 8;
+
+//#codeCleanup
+snmpTrapEpDefaultBandwidth = 30;
+//#codeCleanup
+snmpTrapTotalBandwidthAvailable = 300;
+//#codeCleanup
+
+//#codeCleanup
+systemLogin = "system";
+
+//============== SOLO PROFILER =============================
+profilerWorkLimitTime = TimeDiff[0 01:00:00 0];
+delayPeriodToUpdateSoloProfilerTable = TimeDiff[0 00:01:00 0];
+
+//============== DEBUG ====================================
+//#codeCleanup
+logQueueSize = true;
+queueThreshold = 1000;
+queueInterval = 100;
+trace = false;
+profile = false;
+dumpInstanceInfo = false;
+traceInstanceLeak = false;
+logIOEvents = false;
+printDebugEmitEventMessage = false;
+enableMutexLogging = false;
+logSimulatableEvents = false;
+logUserActions = true;
+logDefaultEventHandler = false;
+logDebug = false;
+collectDebugStats = true;
+
+// SNMP logs ================================================
+logSnmpTraffic = false;
+logSnmpEvent = false;
+logSnmpWarning = false;
+logSnmpError = false;
+logSnmpDebug = false;
+//#codeCleanup
+debugMode = false;
+
+// JOURNALING ================================================
+journalingMode = 2; // 0 - no journaling; 1 - error journaling; 2 - full journaling
+
+//============= CPP EXTENSIONS ==================================
+compilationFilesPath = ".tmp/";
+llvmPath = "/opt/solo/bin/llvm-project/bin/";
+runtimePath = "/opt/solo/bin/gcc/lib/gcc/x86_64-pc-linux-gnu/14.2.0/";
+installPath = "/opt/solo/bin/platform";
+includePath = "/opt/solo/bin/platform/include/platform/";
+linkLibraries = Vector(String)["libsolo-smola", "libsolo-variables", "libsolo-tools", "libsolo-memory", "libsolo-sync", "libm"];

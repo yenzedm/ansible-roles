@@ -1,0 +1,92 @@
+version = "3.0.6";
+xxcFileName = "collector.xxc";
+
+id = "{{ collector.id }}";
+group = "{{ collector.group }}";
+name = "{{ collector.name }}";
+
+customPropertiesFileName = "customHttpCollector.conf";
+
+//============== POOL SIZE ====================================
+dispatcherPoolSize = 10;
+systemPoolSize = 6;
+
+enableGarbageCollector = true;
+garbageCollectorPeriod = TimeDiff[0 00:05:00 0];
+
+//============== TCP CLIENT ====================================
+ip = "{{ platform.ip }}";
+port = 2612;
+//#codeCleanup
+reconnectPeriod = TimeDiff[0 00:00:05 0];
+
+connectionAttempts = 5;
+reserveAddresses = Vector(Pair(String, Integer))[Pair(String, Integer)["0.0.0.0", 2622]];
+//#codeCleanup
+statisticsPeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+hostDetailsUpdatePeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+keepAlivePeriod = TimeDiff[0 00:10:00 0];
+token = "fGSQRJa04bqdlx6sOSbBNKxdVpEXiJW5PBnNYZjinpydT1023RcYsiOh9m2NYGIp";
+
+//============= COLLECTORS ==================================
+collectors = Map(String, String)["http" : "oHttpCollector"];
+//#codeCleanup
+maxModelDiscoveryTime = TimeDiff[0 01:00:00 0];
+//#codeCleanup
+dataPackSize = 50;
+// Full snapshot resend interval (in polls) for cached providers. 0 = disabled.
+keyFrameInterval = 0;
+//#codeCleanup
+modelFlowControlPackSize = 10;
+//#codeCleanup
+checkerDownCount = 3;
+
+shortJobStartDelay = TimeDiff[0 00:00:30 0];
+longJobStartDelay = TimeDiff[0 00:01:00 0];
+
+//============== HTTP ====================================
+httpProtocolKeepAlivePeriod = TimeDiff[0 00:01:00 0];
+
+//============= TLS ==================================
+//#codeCleanup
+caFile = "/etc/ssl/certs/ca-certificates.crt";
+//#codeCleanup
+caPath = "/etc/ssl/certs/";
+
+//============= CPP EXTENSIONS ==================================
+compilationFilesPath = ".tmp/";
+llvmPath = "/opt/solo/bin/llvm-project/bin/";
+runtimePath = "/opt/solo/bin/gcc/lib/gcc/x86_64-pc-linux-gnu/14.2.0/";
+installPath = "/opt/solo/bin/platform/";
+includePath = "/opt/solo/bin/platform/include/platform/";
+linkLibraries = Vector(String)["libsolo-smola", "libsolo-variables", "libsolo-tools", "libsolo-memory", "libsolo-sync", "libm"];
+
+//============== SOLO PROFILER ===========================
+profilerWorkLimitTime = TimeDiff[0 01:00:00 0];
+delayPeriodToUpdateSoloProfilerTable = TimeDiff[0 00:01:00 0];
+
+//============== DEBUG ====================================
+//#codeCleanup
+logQueueSize = true;
+queueThreshold = 1000;
+queueInterval = 100;
+trace = false;
+profile = false;
+dumpInstanceInfo = false;
+traceInstanceLeak = false;
+logIOEvents = false;
+printDebugEmitEventMessage = false;
+enableMutexLogging = false;
+logSimulatableEvents = false;
+logUserActions = true;
+logDefaultEventHandler = false;
+logDebug = false;
+collectDebugStats = true;
+
+//#codeCleanup
+debugMode = false;
+
+timeZoneOffset = -180;
+defaultLocale = "en";

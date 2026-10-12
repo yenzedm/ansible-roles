@@ -1,0 +1,63 @@
+# @eremeev.da
+---
+version: "25092026"
+path_to_distrib: "/opt/distrib"
+install_debug: false
+custom_path: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+solodb:
+  install: false
+  ip: "192.168.1.129"
+  script_name: "solodb.sh"
+gui:
+  install: false
+  script_name: "gui.sh"
+  dest_for_wstunnel: "/opt/solo/lighttpd/etc/conf.d/"
+platform:
+  install: false
+  ip: "192.168.1.129"
+  script_name: "platform.sh"
+  id: "url"
+  root_id: 211
+  master_ip: "1.1.1.1"
+  connect_to_master: "false"
+  project: "mrsk"
+  dest_for_core: "/opt/solo/core"
+  license_sign: ""
+collectors:
+  script_name: "collector.sh"
+  install: true
+  type:
+    - collector_type: "snmp"
+      install: false
+      id: "url-a-snmp"
+      group: "url"
+      name: "url-a-snmp"
+    - collector_type: "cli"
+      install: true
+      id: "url-a-cli"
+      group: "url"
+      name: "url-a-cli"
+    - collector_type: "http"
+      install: false
+      id: "url-a-http" 
+      group: "url"
+      name: "url-a-http"
+    - collector_type: "probe"
+      install: false
+      id: "url-a-probe"
+      group: "url"
+      name: "url-a-probe"
+    - collector_type: "flow"
+      install: false
+      id: "url-a-flow"
+      group: "url"
+      name: "url-a-flow"
+    - collector_type: "iec"
+      install: false
+      id: "iec-m-esok.rosseti.ural" 
+      group: "url"
+      name: "iec-m-esok.rosseti.ural"
+integration:
+  install: false
+  ip: "192.168.1.129"
+  script_name: "integration.sh" 

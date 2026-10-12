@@ -1,0 +1,199 @@
+# @eremeev.da
+---
+- name: Install solodb
+  block:
+    - name: Start solodb
+      shell: |
+        cd {{ path_to_distrib }}/{{ version }}
+        {{ path_to_distrib }}/{{ version }}/{{ solodb.script_name }} start
+      environment:
+        PATH: "{{ custom_path }}"
+      register: solodb_start
+
+    - name: Script output
+      debug:
+        var: solodb_start
+      when: install_debug
+             
+  become: yes
+  when: solodb.install
+
+- name: Install gui  
+  block:        
+    - name: Start gui
+      shell: |
+        cd {{ path_to_distrib }}/{{ version }}
+        {{ path_to_distrib }}/{{ version }}/{{ gui.script_name }} start
+      environment:
+        PATH: "{{ custom_path }}"
+      register: gui_start
+
+    # Debug
+    - name: Script output
+      debug:
+        var: gui_start
+      when: install_debug
+     
+    - name: Copy wstunnel.conf
+      template:
+        src: wstunnel.conf.j2
+        dest: "{{ gui.dest_for_wstunnel }}/wstunnel.conf"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+        
+    - name: Restart gui
+      shell: |
+        cd {{ path_to_distrib }}/{{ version }}
+        {{ path_to_distrib }}/{{ version }}/{{ gui.script_name }} stop
+        {{ path_to_distrib }}/{{ version }}/{{ gui.script_name }} start
+      environment:
+        PATH: "{{ custom_path }}"
+      register: gui_restart 
+
+    # Debug
+    - name: Script output
+      debug:
+        var: gui_restart
+      when: install_debug
+   
+  become: yes
+  when: gui.install
+
+- name: Install platform
+  block:
+    - name: Create {{ platform.dest_for_core }}
+      file:
+        path: "{{ platform.dest_for_core }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+        
+    - name: Copy customProperties.conf
+      template:
+        src: customProperties.conf.j2
+        dest: "{{ platform.dest_for_core }}/customProperties.conf"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+        
+    - name: Check license.txt exist
+      stat:
+        path: "{{ platform.dest_for_core }}/license.txt"
+      register: license_stat
+
+    - name: Copy license.txt
+      template:
+        src: license.txt.j2
+        dest: "{{ platform.dest_for_core }}/license.txt"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      when: not license_stat.stat.exists
+        
+    - name: Start platform
+      shell: |
+        cd {{ path_to_distrib }}/{{ version }}
+        {{ path_to_distrib }}/{{ version }}/{{ platform.script_name }} start
+      environment:
+        PATH: "{{ custom_path }}"
+      register: platform_start
+
+    # Debug
+    - name: Script output
+      debug:
+        var: platform_start
+      when: install_debug
+      
+  become: yes
+  when: platform.install
+  
+- name: Install collectors
+  block:    
+    - name: Create {{ platform.dest_for_core }}
+      file:
+        path: "{{ platform.dest_for_core }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+        
+    - name: Check license.txt exist
+      stat:
+        path: "{{ platform.dest_for_core }}/license.txt"
+      register: license_stat
+
+    - name: Copy license.txt
+      template:
+        src: license.txt.j2
+        dest: "{{ platform.dest_for_core }}/license.txt"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      when: not license_stat.stat.exists
+
+    - name: Install collectors
+      include_tasks: install-collector.yml
+      loop: "{{ collectors.type }}"
+      loop_control:
+        loop_var: collector
+      when: collector.install
+            
+  become: yes
+  when: collectors.install
+  
+- name: Install integration
+  block:
+    - name: Create {{ platform.dest_for_core }}
+      file:
+        path: "{{ platform.dest_for_core }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+        
+    - name: Copy integration.conf
+      template:
+        src: integration.conf.j2
+        dest: "{{ platform.dest_for_core }}/integration.conf"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+
+    - name: Check license.txt exist
+      stat:
+        path: "{{ platform.dest_for_core }}/license.txt"
+      register: license_stat
+
+    - name: Copy license.txt
+      template:
+        src: license.txt.j2
+        dest: "{{ platform.dest_for_core }}/license.txt"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      when: not license_stat.stat.exists
+         
+    - name: Start integration
+      shell: |
+        cd {{ path_to_distrib }}/{{ version }}
+        {{ path_to_distrib }}/{{ version }}/{{ integration.script_name }} start
+      environment:
+        PATH: "{{ custom_path }}"
+      register: integration_start
+
+    # Debug
+    - name: Script output
+      debug:
+        var: integration_start
+      when: install_debug
+      
+  become: yes
+  when: integration.install

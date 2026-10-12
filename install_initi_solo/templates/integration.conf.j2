@@ -1,0 +1,212 @@
+version = "3.0.6";
+xxcFileName = "integration.xxc";
+
+id = "int";
+group = "int";
+
+rootId = 2;
+
+//============== POOL SIZE ====================================
+dispatcherPoolSize = 6;
+systemPoolSize = 4;
+
+enableGarbageCollector = true;
+garbageCollectorPeriod = TimeDiff[0 00:05:00 0];
+
+//============== ADMINISTRATION =============================
+//#codeCleanup
+defaultLocale = "en";
+//#codeCleanup
+localesList = Set(String)["ru", "en"];
+//#codeCleanup
+systemLogin = "system";
+//#codeCleanup
+hostDetailsUpdatePeriod = TimeDiff[0 00:05:00 0];
+
+//============= INTERGRATION ROUTER SETTINGS ================================
+//#codeCleanup
+routerIp = "0.0.0.0";
+routerPort = 2601;
+//#codeCleanup
+routerSendTimeout = TimeDiff[0 00:01:00 0];
+
+routerPaths = Set(Deque(Pair(String, Integer)))
+[
+    Deque(Pair(String, Integer))
+    [
+        Pair(String, Integer)["{{ platform.ip }}", 2600],
+        Pair(String, Integer)["127.0.0.2", 2620]
+    ]
+];
+connectionAttempts = 5;
+integrationDir = "basic/integration/";
+closeTicketsDir = "./storage/" + id + "/ticketsToClose/";
+factDetectionsDir = "./storage/" + id + "/factDetections/";
+analyticsDir = "./basic/analytics/";
+
+//============= ROOT CAUSE ================================
+//#codeCleanup
+rcaPeriod = TimeDiff[0 00:15:00 0];
+//#codeCleanup
+rcaMinDelay = TimeDiff[0 00:00:10 0];
+rcaMaxDelay = TimeDiff[0 00:00:20 0];
+//#codeCleanup
+rcaMinTimeout = TimeDiff[0 00:00:01 0];
+
+systemSubDir = "system/";
+projectCustomSubDir = "projectCustom/";
+userCustomSubDir = "userCustom/";
+
+//#codeCleanup
+timeZoneOffset = -180;
+
+//============= NBI Techniques =============
+// NBI_TECH_COMMON = 0;
+// NBI_TECH_LLM = 1;
+// NBI_TECH_TENSORFLOW = 2;
+// NBI_TECH_KAFKA = 3;
+// NBI_TECH_JSONAPI = 4;
+// NBI_TECH_TELEGRAM = 5;
+// NBI_TECH_PYTHONAPI = 6;
+// NBI_TECH_RESTAPI = 7;
+// NBI_TECH_COMPUTERVISION = 8;
+// NBI_TECH_RABBITMQ = 9;
+// NBI_TECH_HTTPAI = 10;
+nbiTechs = Set(Integer)[0, 4, 5, 6, 7, 10];
+
+//============= KAFKA SETTINGS =============
+kafkaEnable = true;
+//#codeCleanup
+minimalSendDelay = TimeDiff[0 00:00:05 0];
+//#codeCleanup
+kafkaRequestTimeout = TimeDiff[0 00:00:30 0];
+
+//============ PROJECT ====================
+//#codeCleanup
+// mac              - Macomnet
+//project = "rt";
+//project = "tetra";
+//project = "mmk";
+//project = "mrsk";
+//project = "mnine";
+//project = "mac";
+project = "prod";
+
+//============ PROJECT RTRS ====================
+//used ONLY in requestTUStructureReceiver
+soloAddress = Address ["master", "mm", "solo"];
+pollingProfilesTreeTag = "ppt";
+
+//============= COLLECTORS ==================================
+// cliLibPath = "libsolo-cli";
+// cliRunnerTimeout = TimeDiff[0 00:00:15 0];
+
+//============== DEBUG ====================================
+//#codeCleanup
+logQueueSize = true;
+queueThreshold = 1000;
+queueInterval = 100;
+trace = false;
+profile = false;
+dumpInstanceInfo = false;
+traceInstanceLeak = false;
+logIOEvents = false;
+printDebugEmitEventMessage = false;
+enableMutexLogging = false;
+logSimulatableEvents = false;
+logUserActions = true;
+logSmolaDeh = false;
+logSnmpTraffic = false;
+logSnmpEvent = false;
+logHttpTraffic = false;
+logDebug = true;
+
+//============== SYSTEM ====================================
+//#codeCleanup
+profilesTreeTag = "prf";
+httpSlaveProviderTreeTag = "hsptt";
+connectorManagerTag = "cm";
+jsonRpcTag = "jsonrpc";
+nbiDiskPath = "./nbiDisk/" + id + "/";
+diskFileChunkSize = 5242880; // 5 Mb in bytes
+pyApiFileName = "pythonAPIs.csv";
+
+//============== TCP SERVER ====================================
+tcpServerTag = "tcp";
+tcpServerIp = "0.0.0.0";
+tcpServerPortTls = 2630;
+tcpServerPort = 2610;
+
+pythonApiTcpServerTag = "pythonApiTcp";
+pythonApiTcpServerIp = "0.0.0.0";
+pythonApiTcpServerPort = 2624;
+
+//#codeCleanup
+statisticsPeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+reconnectPeriod = TimeDiff[0 00:00:30 0];
+//#codeCleanup
+keepAlivePeriod = TimeDiff[0 00:10:00 0];
+//#codeCleanup
+keepAliveTimeout = TimeDiff[0 00:10:30 0];
+token = "2vEOpEZada5zDxkstBE8Ui9lf1zMItvArcFqw25NFiFL78Lj0Ow5Lfeq57Eo8bM6";
+
+httpRequestWorkerTimeout = TimeDiff[0 00:01:00 0];
+
+//============== FORECAST ===================================
+//#codeCleanup
+nnModelsDir = "./storage/" + id + "/predictionModels/";
+maxNnModelsLoaded = 4;
+
+//#codeCleanup
+//  linearResampling
+//  ffillResampling
+//  bfillResampling
+//  emaResampling
+resampling = "ffillResampling";
+
+//#codeCleanup
+testSize = 0.2;
+//#codeCleanup
+minSize = 24;
+
+//============= TLS ==================================
+//#codeCleanup
+caFile = "/etc/ssl/certs/ca-certificates.crt";
+//#codeCleanup
+caPath = "/etc/ssl/certs/";
+tlsCertPath = "./tlsCert/cert.pem";
+tlsKeyPath =  "./tlsCert/key.pem";
+
+//============= PYTHON ==================================
+// pythonPath = "python3";
+pythonPath = ".venv/bin/python";
+
+//============= CPP EXTENSIONS ==================================
+compilationFilesPath = ".tmp/";
+llvmPath = "/opt/solo/bin/llvm-project/bin/";
+runtimePath = "/opt/solo/bin/gcc/lib/gcc/x86_64-pc-linux-gnu/14.2.0/";
+installPath = "/opt/solo/bin/platform";
+includePath = "/opt/solo/bin/platform/include/platform/";
+linkLibraries = Vector(String)["libsolo-smola", "libsolo-variables", "libsolo-tools", "libsolo-memory", "libsolo-sync", "libm"];
+
+//============== SOLO PROFILER ===========================
+profilerWorkLimitTime = TimeDiff[0 01:00:00 0];
+delayPeriodToUpdateSoloProfilerTable = TimeDiff[0 00:01:00 0];
+
+//============= MIBs PATH ============================
+//#codeCleanup
+mibsPath = "./storage/master/certifierAssistantMIBs/mibs/";
+//#codeCleanup
+parsedMibPath = "./storage/master/certifierAssistantMIBs/parsedMibs/";
+//#codeCleanup
+typeMibsPath = "./storage/master/certifierAssistantMIBs/typeMibs/";
+//#codeCleanup
+totalMibPath = "./storage/master/certifierAssistantMIBs/totalMib/totalMib.xxc";
+
+//============= TELEGRAM ==================================
+tdLibPath = "libsolo-telegram";
+// API id for telegram messaging. Open docs/telegram.txt for more info
+telegramApiId = 24036357;
+// API hash for telegram messaging. Open docs/telegram.txt for more info
+telegramApiHash = "e56c569aca83fab42556627f6b88121d";

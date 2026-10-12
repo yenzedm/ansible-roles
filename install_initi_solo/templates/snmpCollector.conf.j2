@@ -1,0 +1,193 @@
+version = "3.0.6";
+xxcFileName = "collector.xxc";
+
+id = "{{ collector.id }}";
+group = "{{ collector.group }}";
+name = "{{ collector.name }}";
+
+customPropertiesFileName = "customSnmpCollector.conf";
+
+//============== POOL SIZE ====================================
+dispatcherPoolSize = 10;
+systemPoolSize = 6;
+
+enableGarbageCollector = true;
+garbageCollectorPeriod = TimeDiff[0 00:05:00 0];
+
+//============== TCP CLIENT ====================================
+ip = "{{ platform.ip }}";
+port = 2612;
+//#codeCleanup
+reconnectPeriod = TimeDiff[0 00:00:05 0];
+
+connectionAttempts = 5;
+reserveAddresses = Vector(Pair(String, Integer))[Pair(String, Integer)["0.0.0.0", 2622]];
+//#codeCleanup
+statisticsPeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+hostDetailsUpdatePeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+keepAlivePeriod = TimeDiff[0 00:10:00 0];
+token = "4zqTaEUM2SmjMjFcGvko4jWcn1cI0E7D6JvV0uqjEuw4idKg91jLr5fdD0svE17e";
+
+//============= COLLECTORS ==================================
+collectors = Map(String, String)["snmp" : "oSnmpCollector"];
+// Dictionaries from core
+dictionaries = Set(Vector(String))[
+    Vector(String)["Software", "ports"],
+    Vector(String)["Software", "applications"],
+    Vector(String)["Enums", "sensorType"],
+];
+//#codeCleanup
+maxModelDiscoveryTime = TimeDiff[0 01:00:00 0];
+//#codeCleanup
+enableFPforGeneric = false;
+//#codeCleanup
+checkerDownCount = 3;
+
+// ================= ICMP ============================
+icmpLibPath = "libsolo-icmp";
+//#codeCleanup
+icmpPoolSize = 4;
+//#codeCleanup
+icmpConcurentJobs = 128;
+//#codeCleanup
+icmpHost = "0.0.0.0";
+//#codeCleanup
+icmpPort = 0;
+//#codeCleanup
+// icmpDevice = "lo";
+//#codeCleanup
+// icmpIpv6 = true;
+//#codeCleanup
+icmpUnlockJobMinDelay = TimeDiff[0 00:00:15 0];
+//#codeCleanup
+icmpMinDelayPart = 0.2
+
+// ================= SNMP ============================
+snmpLibPath = "libsolo-snmp";
+//#codeCleanup
+snmpPoolSize = 8;
+//#codeCleanup
+snmpConcurentJobs = 128;
+//#codeCleanup
+snmpHost = "0.0.0.0";
+//#codeCleanup
+snmpPort = 0;
+//#codeCleanup
+// snmpIpv6 = true;
+//#codeCleanup
+// snmpDevice = "lo";
+//#codeCleanup
+maxRecords = 30;
+//#codeCleanup
+pollMaxRecords = 30;
+//#codeCleanup
+modelFlowControlPackSize = 20;
+//#codeCleanup
+maxRepetitions = 8;
+//#codeCleanup
+snmpUnlockJobMinDelay = TimeDiff[0 00:02:00 0];
+//#codeCleanup
+snmpMinDelayPart = 0.2
+//#codeCleanup
+shortJobStartDelay = TimeDiff[0 00:00:05 0];
+//#codeCleanup
+longJobStartDelay = TimeDiff[0 00:00:10 0];
+//#codeCleanup
+allowedMasters = Set(String)[];
+
+// ================= SNMP TRAPS ============================
+trapLibPath = "libsolo-snmp-trap-catcher";
+//#codeCleanup
+snmpTrapHost = "0.0.0.0";
+//#codeCleanup
+snmpTrapPort = 163;
+//#codeCleanup
+// snmpTrapIpv6 = true;
+//#codeCleanup
+// snmpTrapDevice = "lo";
+//#codeCleanup
+snmpTrapEngineId = Blob[0x80, 0x00, 0x1f, 0x88, 0x04, 0x30, 0x78, 0x30, 0x31, 0x32, 0x33, 0x34, 0x30, 0x30, 0x30, 0x30, 0x31];
+//#codeCleanup
+snmpTrapDefaultAuthProfile = "standartSnmp";
+//#codeCleanup
+snmpTrapAuthMap = Map(Blob, String)[];
+//#codeCleanup
+trapHandlers = 8;
+
+snmpTrapReceptionTimeout = TimeDiff[0 00:00:00 0];
+//#codeCleanup
+suspendTrapsOnDisconnect = true;
+snmpStatisticsEnabled = true;
+snmpTrapStatisticsEnabled = true;
+snmpTrapStatisticsFlushPeriod = TimeDiff[0 00:00:10 0];
+snmpUnknownTrapQueueLimit = 200000;
+snmpUnknownTrapInsertPackSize = 20000;
+
+//#codeCleanup
+snmpTrapEpDefaultBandwidth = 30;
+//#codeCleanup
+snmpTrapTotalBandwidthAvailable = 300;
+//#codeCleanup
+
+//============== SETTERS =================================
+//#codeCleanup
+tftpServerAddress = "0.0.0.0";
+//#codeCleanup
+tftpDir = "/var/lib/tftpboot/";
+
+//#codeCleanup
+systemLogin = "system";
+defaultLocale = "en";
+
+//============== SOLO PROFILER =============================
+profilerWorkLimitTime = TimeDiff[0 01:00:00 0];
+delayPeriodToUpdateSoloProfilerTable = TimeDiff[0 00:01:00 0];
+
+//============== DEBUG ====================================
+//#codeCleanup
+logQueueSize = true;
+queueThreshold = 1000;
+queueInterval = 100;
+trace = false;
+profile = false;
+dumpInstanceInfo = false;
+traceInstanceLeak = false;
+logIOEvents = false;
+printDebugEmitEventMessage = false;
+enableMutexLogging = false;
+logSimulatableEvents = false;
+logUserActions = true;
+logDefaultEventHandler = false;
+logDebug = false;
+
+// SNMP logs ================================================
+logSnmpTraffic = false;
+logSnmpEvent = false;
+logSnmpWarning = false;
+logSnmpError = false;
+logSnmpDebug = false;
+
+//#codeCleanup
+debugMode = false;
+timeZoneOffset = -180;
+collectDebugStats = true;
+
+// CPP EXTENTIONS
+llvmPath = "/opt/solo/bin/llvm-project/bin/";
+runtimePath = "/opt/solo/bin/gcc/lib/gcc/x86_64-pc-linux-gnu/14.2.0/";
+installPath = "/opt/solo/bin/platform";
+includePath = "/opt/solo/bin/platform/include/platform/";
+providersIncludePath = "./include/";
+compilationFilesPath = ".build/snmpCollector/";
+linkLibraries = Vector(String)["libsolo-smola", "libsolo-variables", "libsolo-tools", "libsolo-memory", "libsolo-sync", "libm"];
+trapCompilationFilesPath = ".build/snmpCollector/traps/";
+trapLinkLibraries = Vector(String)["libsolo-smola", "libsolo-variables", "libsolo-tools", "libsolo-memory", "libsolo-sync", "libsolo-snmp-trap-catcher"];
+trapProviderCacheDirPath = ".build/snmpCollector/traps/cache/";
+// Full snapshot resend interval (in polls) for cached providers. 0 = disabled.
+keyFrameInterval = 0;
+// Persistent store for slave-side data kept across cycles/restarts (e.g. runningSoftware that lost its processes).
+slavePersistentStorage = "slavePersistent.storage";
+// Debounced disk-flush interval for the slave persistent store.
+slavePersistentSaveInterval = TimeDiff[0 00:00:05 0];

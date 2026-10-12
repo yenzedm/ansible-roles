@@ -1,0 +1,85 @@
+version = "3.0.6";
+xxcFileName = "collector.xxc";
+defaultLocale = "en";
+
+id = "{{ collector.id }}";
+group = "{{ collector.group }}";
+name = "{{ collector.name }}";
+
+customPropertiesFileName = "customIecCollector.conf";
+
+systemLogin = "system";
+
+//============== POOL SIZE ====================================
+dispatcherPoolSize = 10;
+systemPoolSize = 6;
+
+enableGarbageCollector = true;
+garbageCollectorPeriod = TimeDiff[0 00:05:00 0];
+
+//============== TCP CLIENT ====================================
+ip = "{{ platform.ip }}";
+port = 2612;
+//#codeCleanup
+reconnectPeriod = TimeDiff[0 00:00:05 0];
+
+connectionAttempts = 5;
+reserveAddresses = Vector(Pair(String, Integer))[Pair(String, Integer)["0.0.0.0", 2622]];
+//#codeCleanup
+statisticsPeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+hostDetailsUpdatePeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+keepAlivePeriod = TimeDiff[0 00:10:00 0];
+token = "TySI7SWNFcliyujRdsvvfF0D91WW7NpXE24rsVUUvo1imUhAKyUy7zruFqZevqli";
+
+//============= COLLECTORS ==================================
+
+collectors = Map(String, String)["iec104" : "oIec104Collector"];
+//#codeCleanup
+maxModelDiscoveryTime = TimeDiff[0 01:00:00 0];
+
+iecLibPath = "libsolo-iec104";
+
+//IEC Reconnect period
+iecReconnectPeriod = TimeDiff[0 00:00:05 0];
+iecTimeZoneOffset = 3;
+//#codeCleanup
+dataPackSize = 100;
+//#codeCleanup
+modelFlowControlPackSize = 100;
+
+//============== SOLO PROFILER =============================
+profilerWorkLimitTime = TimeDiff[0 01:00:00 0];
+delayPeriodToUpdateSoloProfilerTable = TimeDiff[0 00:01:00 0];
+
+//============= CPP EXTENSIONS ==================================
+compilationFilesPath = ".tmp/";
+llvmPath = "/opt/solo/bin/llvm-project/bin/";
+runtimePath = "/opt/solo/bin/gcc/lib/gcc/x86_64-pc-linux-gnu/14.2.0/";
+installPath = "/opt/solo/bin/platform";
+includePath = "/opt/solo/bin/platform/include/platform/";
+linkLibraries = Vector(String)["libsolo-smola", "libsolo-variables", "libsolo-tools", "libsolo-memory", "libsolo-sync", "libm"];
+
+//============== DEBUG ====================================
+//#codeCleanup
+logQueueSize = true;
+queueThreshold = 1000;
+queueInterval = 100;
+trace = false;
+profile = false;
+dumpInstanceInfo = false;
+traceInstanceLeak = false;
+logIOEvents = false;
+printDebugEmitEventMessage = false;
+enableMutexLogging = false;
+logSimulatableEvents = false;
+logUserActions = true;
+logDefaultEventHandler = false;
+logIEC104Traffic = false;
+logDebug = false;
+collectDebugStats = true;
+
+//#codeCleanup
+debugMode = false;
+timeZoneOffset = -180;

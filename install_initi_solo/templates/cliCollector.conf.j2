@@ -1,0 +1,104 @@
+version = "3.0.6";
+xxcFileName = "collector.xxc";
+id = "{{ collector.id }}";
+group = "{{ collector.group }}";
+name = "{{ collector.name }}";
+
+customPropertiesFileName = "customCliCollector.conf";
+
+defaultLocale = "en";
+
+dispatcherPoolSize = 10;
+systemPoolSize = 6;
+
+enableGarbageCollector = true;
+garbageCollectorPeriod = TimeDiff[0 00:05:00 0];
+
+//============== TCP CLIENT ====================================
+ip = "{{ platform.ip }}";
+port = 2612;
+//#codeCleanup
+reconnectPeriod = TimeDiff[0 00:00:05 0];
+
+connectionAttempts = 5;
+reserveAddresses = Vector(Pair(String, Integer))[Pair(String, Integer)["0.0.0.0", 2622]];
+//#codeCleanup
+statisticsPeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+hostDetailsUpdatePeriod = TimeDiff[0 00:05:00 0];
+//#codeCleanup
+keepAlivePeriod = TimeDiff[0 00:10:00 0];
+token = "mjnjuOb8HrCBtgyvKrUbjp2IUQcVt2Hjdg0OYRiig94H51mAXSR4nr4S3tSsbC19";
+
+//============= COLLECTORS ==================================
+cliLibPath = "libsolo-cli";
+collectors = Map(String, String)["cli" : "oCliCollector"];
+dictionaries = Set(Vector(String))[
+    Vector(String)["Software", "ports"],
+    Vector(String)["Software", "applications"],
+];
+//#codeCleanup
+maxModelDiscoveryTime = TimeDiff[0 01:00:00 0];
+shortJobStartDelay = TimeDiff[0 00:00:30 0];
+longJobStartDelay = TimeDiff[0 00:01:00 0];
+//#codeCleanup
+dataPackSize = 50;
+// Full snapshot resend interval (in polls) for cached providers. 0 = disabled.
+keyFrameInterval = 0;
+// Persistent store for slave-side data kept across cycles/restarts (e.g. runningSoftware that lost its processes).
+slavePersistentStorage = "slavePersistent.storage";
+// Debounced disk-flush interval for the slave persistent store.
+slavePersistentSaveInterval = TimeDiff[0 00:00:05 0];
+//#codeCleanup
+modelFlowControlPackSize = 20;
+//#codeCleanup
+checkerDownCount = 3;
+
+//#codeCleanup
+usePrefixAsId = false;
+// Queue for exec
+runBinaryQueueLimit = 100;
+// Parallel exec count
+cliWorkersCount = 6;
+//#codeCleanup
+keyStoreDir = "./.keyStore";
+//#codeCleanup
+tftpServerAddress = "0.0.0.0";
+//#codeCleanup
+tftpDir = "/var/lib/tftpboot/";
+
+//============= CPP EXTENSIONS ==================================
+compilationFilesPath = ".tmp/";
+llvmPath = "/opt/solo/bin/llvm-project/bin/";
+runtimePath = "/opt/solo/bin/gcc/lib/gcc/x86_64-pc-linux-gnu/14.2.0/";
+installPath = "/opt/solo/bin/platform";
+includePath = "/opt/solo/bin/platform/include/platform/";
+providersIncludePath = "./include/";
+linkLibraries = Vector(String)["libsolo-smola", "libsolo-variables", "libsolo-tools", "libsolo-memory", "libsolo-sync", "libm"];
+
+//============== SOLO PROFILER ===========================
+profilerWorkLimitTime = TimeDiff[0 01:00:00 0];
+delayPeriodToUpdateSoloProfilerTable = TimeDiff[0 00:01:00 0];
+
+//============== DEBUG ====================================
+//#codeCleanup
+logQueueSize = true;
+queueThreshold = 1000;
+queueInterval = 100;
+trace = false;
+profile = false;
+dumpInstanceInfo = false;
+traceInstanceLeak = false;
+logIOEvents = false;
+printDebugEmitEventMessage = false;
+enableMutexLogging = false;
+logSimulatableEvents = false;
+logUserActions = true;
+logDefaultEventHandler = false;
+logDebug = true;
+collectDebugStats = true;
+
+timeZoneOffset = -180;
+//#codeCleanup
+debugMode = false;
+sysInfoLibPath = "libsolo-sysinfo";

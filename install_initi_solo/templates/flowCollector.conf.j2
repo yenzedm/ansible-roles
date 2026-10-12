@@ -1,0 +1,129 @@
+version = "3.0.6";
+xxcFileName = "collector.xxc";
+defaultLocale = "en";
+
+id = "{{ collector.id }}";
+group = "{{ collector.group }}";
+name = "{{ collector.name }}";
+
+customPropertiesFileName = "customFlowCollector.conf";
+
+//============== POOL SIZE ====================================
+dispatcherPoolSize = 10;
+systemPoolSize = 6;
+filterPoolSize = 8;
+
+enableGarbageCollector = true;
+garbageCollectorPeriod = TimeDiff[0 00:05:00 0];
+
+//============== TCP CLIENT ====================================
+ip = "{{ platform.ip }}";
+port = 2612;
+// Frequency of attempts to connect to the core
+reconnectPeriod = TimeDiff[0 00:00:05 0];
+
+connectionAttempts = 5;
+reserveAddresses = Vector(Pair(String, Integer))[Pair(String, Integer)["0.0.0.0", 2622]];
+// Frequency of statistics generation
+statisticsPeriod = TimeDiff[0 00:05:00 0];
+// The period for updating information about the host on which the collector is running
+hostDetailsUpdatePeriod = TimeDiff[0 00:05:00 0];
+// Request frequency of keepAlive
+keepAlivePeriod = TimeDiff[0 00:10:00 0];
+token = "aWGcrlVQZwM6FdZMbYzr7P9sW3jSBziqFtvrEX4pXPWqMlvJaDF9mTzTobUTcHCp";
+
+//============= COLLECTORS ==================================
+
+collectors = Map(String, String)["flow" : "oNetFlowCollector"];
+
+// Delivered with module data; used for service component naming
+dictionaries = Set(Vector(String))[
+    Vector(String)["Software", "ipProtocols"],
+    Vector(String)["Software", "networkServices"],
+];
+
+flowLibPath = "libsolo-netflow";
+
+// Bind address for both flow listeners
+flowIp = "0.0.0.0";
+// NetFlow v5/v9/IPFIX listener (version auto-detected per packet); 0 disables
+flowPort = 9996;
+// sFlow v5 listener; 0 disables
+sflowPort = 6343;
+
+// Spread of the periodic component updates: exporters are split into this many
+// buckets and one bucket is flushed per timer tick
+flowDiscoveryBuckets = 10;
+
+//============= DISCOVERY PLACEMENT (per-collector; seeds the component) =====
+// These keys seed the soloFlowCollector component at the FIRST registration;
+// afterwards the values SET on the component win over this file
+
+// New-exporter policy: 0 - ignore, 1 - generate an event, 2 - create a model
+flowDiscoveryNewExporterPolicy = 2;
+// Raw statistics writing: 0 - all exporters, 1 - known exporters only
+flowRawWritePolicy = 0;
+// Base component type of the models created by flow discovery
+flowDiscoveryDeviceType = "networkDevice";
+// Type of the interface components created by flow discovery
+flowDiscoveryInterfaceType = "simpleInterface";
+// Container model address SUFFIX under the model manager; empty - solo
+flowDiscoveryModelContainer = Address[];
+
+// Apply resolving all - hostname and service type by port, ports - only service type by port, empty - do not apply
+useDNSfor = Set(String)["ports"];
+
+flowAggrInterval = TimeDiff[0 00:05:00 0];
+flowAggrPackSize = 250;
+
+//============= RAW WRITER (netflow.flowsRaw direct insert) =====
+// batch size that triggers an immediate insert
+flowRawPackSize = 20000;
+// periodic flush of an incomplete batch
+flowRawFlushPeriod = TimeDiff[0 00:00:05 0];
+// backpressure cap: above this the accumulated rows are dropped (drop-oldest)
+flowRawQueueLimit = 200000;
+flowRateComponentPeriod = TimeDiff[0 00:05:00 0];
+
+//============== SOLO PROFILER ===========================
+profilerWorkLimitTime = TimeDiff[0 01:00:00 0];
+delayPeriodToUpdateSoloProfilerTable = TimeDiff[0 00:01:00 0];
+
+//============= CPP EXTENSIONS ==================================
+compilationFilesPath = ".build/flowCollector";
+llvmPath = "/opt/solo/bin/llvm-project/bin/";
+runtimePath = "/opt/solo/bin/gcc/lib/gcc/x86_64-pc-linux-gnu/14.2.0/";
+installPath = "/opt/solo/bin/platform";
+includePath = "/opt/solo/bin/platform/include/platform/";
+providersIncludePath = "./include/";
+linkLibraries = Vector(String)["libsolo-smola", "libsolo-core", "libsolo-variables", "libsolo-tools", "libsolo-memory", "libsolo-sync", "libsolo-netflow_v2", "libm"];
+
+//============== DEBUG ====================================
+// Debugging tools
+logQueueSize = true;
+queueThreshold = 1000;
+queueInterval = 100;
+trace = false;
+profile = false;
+dumpInstanceInfo = false;
+traceInstanceLeak = false;
+logIOEvents = false;
+printDebugEmitEventMessage = false;
+enableMutexLogging = false;
+logSimulatableEvents = false;
+logUserActions = true;
+logDefaultEventHandler = false;
+logDebug = false;
+// NETFLOW log groups: seeded into the collector component at registration
+logNetflowError = true;
+logNetflowWarning = true;
+logNetflowInfo = false;
+logNetflowDebug = false;
+logNetflowEvent = false;
+logNetflowTraffic = false;
+collectDebugStats = true;
+
+// All providers will be subject to a short survey, regardless of whether the survey is enabled for them in principle
+//+ additional logs
+debugMode = false;
+timeZoneOffset = -180;

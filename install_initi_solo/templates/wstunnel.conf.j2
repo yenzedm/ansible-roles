@@ -1,0 +1,28 @@
+server.modules += ( "mod_wstunnel" )
+$HTTP["url"] =~ "^\/tcp_proxy\/*" {
+    wstunnel.server = ( 
+                "" => ( ( "host" => "{{ platform.ip }}", "port" => "2609" ) ) 
+    )
+#    wstunnel.frame-type = "binary"
+    server.stream-request-body  = 2
+    server.stream-response-body = 2
+    wstunnel.ping-interval = 5
+}
+
+$HTTP["url"] =~ "^\/rdp\/*" {
+    wstunnel.server = (
+        "" => ( ( "host" => "{{ platform.ip }}", "port" => "8088" ) )
+    )
+    wstunnel.frame-type = "binary"
+    server.stream-request-body  = 2
+    server.stream-response-body = 2
+}
+
+$HTTP["url"] =~ "^\/terminal\/*" {
+    wstunnel.server = ( 
+                "" => ( ( "host" => "{{ platform.ip }}", "port" => "23" ) ) 
+    )
+#    wstunnel.frame-type = "binary" 
+    server.stream-request-body  = 2
+    server.stream-response-body = 2
+}

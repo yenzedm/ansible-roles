@@ -1,0 +1,11 @@
+---
+- name: "Backup collector {{ collector.container_name }}"
+  shell: |
+    cd {{ path_to_distrib }}/{{ bak_version }}/{{ bak_dir }}
+    docker commit {{ collector.container_name }} {{ collector.container_name }}:{{ bak_version}}bak
+    sleep 1
+    docker save -o {{ collector.container_name }}-{{ bak_version}}bak.tgz {{ collector.container_name }}:{{ bak_version}}bak
+    sleep 1
+    docker rmi {{ collector.container_name }}:{{ bak_version}}bak
+  environment:
+    PATH: "{{ custom_path }}"

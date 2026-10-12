@@ -1,0 +1,195 @@
+# @eremeev.da
+---
+- name: Backup initi solo containers
+  block:
+    - name: "Create dir {{ path_to_distrib }}/{{ bak_version }}/{{ bak_dir }}"
+      file:
+        path: "{{ path_to_distrib }}/{{ bak_version }}/{{ bak_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'  
+        
+    - name: Backup solodb
+      block:
+        - name: Backup solodb
+          shell: |
+            cd {{ path_to_distrib }}/{{ bak_version }}/{{ bak_dir }}
+            docker commit {{ solodb.container_name }} {{ solodb.container_name }}:{{ bak_version}}bak
+            sleep 1
+            docker save -o {{ solodb.container_name }}-{{ bak_version}}bak.tgz {{ solodb.container_name }}:{{ bak_version}}bak
+            sleep 1
+            docker rmi {{ solodb.container_name }}:{{ bak_version}}bak 
+          environment:
+            PATH: "{{ custom_path }}"
+      become: yes
+      when: solodb.bak
+
+    - name: Backup gui
+      block:
+        - name: Backup gui
+          shell: |
+            cd {{ path_to_distrib }}/{{ bak_version }}/{{ bak_dir }}
+            docker commit {{ gui.container_name }} {{ gui.container_name }}:{{ bak_version}}bak
+            sleep 1
+            docker save -o {{ gui.container_name }}-{{ bak_version}}bak.tgz {{ gui.container_name }}:{{ bak_version}}bak
+            sleep 1
+            docker rmi {{ gui.container_name }}:{{ bak_version}}bak
+          environment:
+            PATH: "{{ custom_path }}"
+      become: yes
+      when: gui.bak
+      
+    - name: Backup platform
+      block:
+        - name: Backup platform
+          shell: |
+            cd {{ path_to_distrib }}/{{ bak_version }}/{{ bak_dir }}
+            docker commit {{ platform.container_name }} {{ platform.container_name }}:{{ bak_version}}bak
+            sleep 1
+            docker save -o {{ platform.container_name }}-{{ bak_version}}bak.tgz {{ platform.container_name }}:{{ bak_version}}bak
+            sleep 1
+            docker rmi {{ platform.container_name }}:{{ bak_version}}bak
+          environment:
+            PATH: "{{ custom_path }}"
+      become: yes
+      when: platform.bak
+
+    - name: Backup collectors
+      block:
+        - name: Backup collectors
+          include_tasks: bak-collector.yml
+          loop: "{{ collectors.type }}"
+          loop_control:
+            loop_var: collector
+          when: collector.bak
+          
+      become: yes
+      when: collectors.bak
+    
+    - name: Backup integration
+      block:
+        - name: Backup integration
+          shell: |
+            cd {{ path_to_distrib }}/{{ bak_version }}/{{ bak_dir }}
+            docker commit {{ integration.container_name }} {{ integration.container_name }}:{{ bak_version}}bak
+            sleep 1
+            docker save -o {{ integration.container_name }}-{{ bak_version}}bak.tgz {{ integration.container_name }}:{{ bak_version}}bak
+            sleep 1
+            docker rmi {{ integration.container_name }}:{{ bak_version}}bak
+          environment:
+            PATH: "{{ custom_path }}"
+      become: yes
+      when: integration.bak
+    
+  become: yes
+  when: bak
+
+- name: Clear docker
+  block:
+    - name: Delete containers
+      shell: |
+        docker rm -f $(docker ps -aq)
+      environment:
+        PATH: "{{ custom_path }}"
+        
+    - name: Delete images
+      shell: |
+        docker rmi $(docker images -a -q)
+      environment:
+        PATH: "{{ custom_path }}"
+      when: delete_images
+
+    - name: Clear docker
+      shell: |
+        docker system prune -f
+      environment:
+        PATH: "{{ custom_path }}"
+
+  become: yes
+  when: update_initi
+  
+- name: Update initi solo
+  block: 
+    - name: Update solodb
+      block:
+        - name: Update solodb
+          shell: |
+            cd {{ path_to_distrib }}/{{ version }}
+            {{ path_to_distrib }}/{{ version }}/{{ solodb.script_name }} start
+          environment:
+            PATH: "{{ custom_path }}"
+          register: solodb_start
+
+        - name: Script output
+          debug:
+            var: solodb_start
+          when: update_debug
+      become: yes
+      when: solodb.update_initi
+
+    - name: Update gui
+      block:
+        - name: Update gui
+          shell: |
+            cd {{ path_to_distrib }}/{{ version }}
+            {{ path_to_distrib }}/{{ version }}/{{ gui.script_name }} start
+          environment:
+            PATH: "{{ custom_path }}"
+          register: gui_start
+
+        - name: Script output
+          debug:
+            var: gui_start
+          when: update_debug
+      become: yes
+      when: gui.update_initi
+      
+    - name: Update platform
+      block:
+        - name: Update platform
+          shell: |
+            cd {{ path_to_distrib }}/{{ version }}
+            {{ path_to_distrib }}/{{ version }}/{{ platform.script_name }} start
+          environment:
+            PATH: "{{ custom_path }}"
+          register: platform_start
+
+        - name: Script output
+          debug:
+            var: platform_start
+          when: update_debug
+      become: yes
+      when: platform.update_initi
+
+    - name: Update collectors
+      block:
+        - name: Update collectors
+          include_tasks: update-collector.yml
+          loop: "{{ collectors.type }}"
+          loop_control:
+            loop_var: collector
+          when: collector.update_initi
+      become: yes
+      when: collectors.update_initi
+        
+    - name: Update integration
+      block:
+        - name: Update integration
+          shell: |
+            cd {{ path_to_distrib }}/{{ version }}
+            {{ path_to_distrib }}/{{ version }}/{{ integration.script_name }} start
+          environment:
+            PATH: "{{ custom_path }}"
+          register: integration_start
+
+        - name: Script output
+          debug:
+            var: integration_start
+          when: update_debug
+      become: yes
+      when: integration.update_initi
+
+  become: yes
+  when: update_initi
+    

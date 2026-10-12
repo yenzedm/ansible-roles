@@ -1,0 +1,24 @@
+# @eremeev.da
+---
+- name: "Copy {{ collector.collector_type }}Collector.conf"
+  template:
+    src: "{{ collector.collector_type }}Collector.conf.j2"
+    dest: "{{ platform.dest_for_core }}/{{ collector.collector_type }}Collector.conf"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+    
+- name: "Start {{ collector.collector_type }} collector"
+  shell: |
+    cd {{ path_to_distrib }}/{{ version }}
+    {{ path_to_distrib }}/{{ version }}/{{ collectors.script_name }} start {{ collector.collector_type }}
+  environment:
+    PATH: "{{ custom_path }}"
+  register: collector_start
+
+# Debug
+- name: Script output
+  debug:
+    var: collector_start
+  when: install_debug
