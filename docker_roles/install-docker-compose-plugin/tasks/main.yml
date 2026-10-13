@@ -25,4 +25,3 @@
   when: >
     docker_compose_check.rc != 0 or
     docker_compose_version not in docker_compose_check.stdout
-  notify: "Docker Compose installed"
